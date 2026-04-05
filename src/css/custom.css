@@ -1,0 +1,46 @@
+/**
+ * Tiponero documentation theme — brand colors derived from the landing page.
+ *
+ * Primary: #FF6600 (Monero orange)
+ * Fonts: Space Grotesk (headings), Inter (body), JetBrains Mono (code)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@300..600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --ifm-color-primary: #ff6600;
+  --ifm-color-primary-dark: #e65c00;
+  --ifm-color-primary-darker: #d95700;
+  --ifm-color-primary-darkest: #b34700;
+  --ifm-color-primary-light: #ff751a;
+  --ifm-color-primary-lighter: #ff7e26;
+  --ifm-color-primary-lightest: #ff944d;
+
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-heading-font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #ff6600;
+  --ifm-color-primary-dark: #e65c00;
+  --ifm-color-primary-darker: #d95700;
+  --ifm-color-primary-darkest: #b34700;
+  --ifm-color-primary-light: #ff751a;
+  --ifm-color-primary-lighter: #ff7e26;
+  --ifm-color-primary-lightest: #ff944d;
+
+  --ifm-background-color: #131313;
+  --ifm-background-surface-color: #1c1b1b;
+  --ifm-footer-background-color: #0e0e0e;
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ifm-heading-font-family);
+  letter-spacing: -0.01em;
+}
