@@ -56,7 +56,7 @@ const config: Config = {
       title: 'Tiponero',
       logo: {
         alt: 'Tiponero Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
       },
       items: [
         {
