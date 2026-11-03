@@ -67,8 +67,8 @@ tiponero-core/
 │   │   ├── htmx.min.js             # Vendored HTMX 2.x
 │   │   └── alpine.min.js           # Vendored Alpine.js 3.x
 │   └── images/
-│       ├── logo.png                 # Tiponero logo
-│       ├── isotype.png              # Tiponero isotype
+│       ├── logo.svg                 # Tiponero mark, transparent
+│       ├── login-lockup.svg         # Mark and wordmark for the login page
 │       └── favicon/                 # Favicon set
 │
 ├── tools/

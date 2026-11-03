@@ -7,6 +7,29 @@ const config: Config = {
   tagline: 'The private Monero payment engine',
   favicon: 'img/favicon.ico',
 
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {rel: 'icon', type: 'image/svg+xml', href: '/img/favicon.svg'},
+    },
+    {
+      tagName: 'link',
+      attributes: {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/img/favicon-32x32.png'},
+    },
+    {
+      tagName: 'link',
+      attributes: {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/img/favicon-16x16.png'},
+    },
+    {
+      tagName: 'link',
+      attributes: {rel: 'apple-touch-icon', sizes: '180x180', href: '/img/apple-touch-icon.png'},
+    },
+    {
+      tagName: 'link',
+      attributes: {rel: 'manifest', href: '/img/site.webmanifest'},
+    },
+  ],
+
   future: {
     v4: true,
   },
@@ -56,7 +79,7 @@ const config: Config = {
       title: 'Tiponero',
       logo: {
         alt: 'Tiponero Logo',
-        src: 'img/logo.png',
+        src: 'img/logo.svg',
       },
       items: [
         {
