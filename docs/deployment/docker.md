@@ -138,9 +138,10 @@ docker build -t tiponero .
 The Dockerfile has two build stages:
 
 **Stage 1: Builder** (`golang:1.26-bookworm`)
-- Installs `templ` CLI and Tailwind CSS standalone binary
+- Downloads the Tailwind CSS standalone binary
 - Downloads Go module dependencies
-- Runs `templ generate` and `tailwindcss` compilation
+- Runs the templ CLI from `tools/go.mod` with `go -C tools tool templ generate`. No templ version appears in the Dockerfile
+- Compiles the Tailwind CSS
 - Builds the Go binary with `CGO_ENABLED=1`
 
 **Stage 2: Runtime** (`gcr.io/distroless/base-debian12`)

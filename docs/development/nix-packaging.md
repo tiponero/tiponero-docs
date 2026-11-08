@@ -101,4 +101,4 @@ The current derivation uses neither option. It regenerates with the nixpkgs bina
 
 ## Docker
 
-The `Dockerfile` installs templ with `go install github.com/a-h/templ/cmd/templ@<version>`. That line is a third place that names the templ version. The other two are `go.mod` and `tools/go.mod`. Update it in the same commit.
+`Dockerfile` runs the templ CLI from `tools/go.mod` with `go -C tools tool templ generate`, so an image build and a local `make build` use the same CLI version. Earlier versions of the Dockerfile installed a fixed version with `go install github.com/a-h/templ/cmd/templ@<version>`, and that copy drifted from `go.mod`.
