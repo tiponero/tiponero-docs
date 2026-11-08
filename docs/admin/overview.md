@@ -41,7 +41,7 @@ The dashboard (`/admin/`) shows:
 The transactions page (`/admin/transactions`) gives you:
 
 - **Paginated list:** 10 transactions per page
-- **Status filter:** filter by `pending`, `mempool`, `confirming`, `confirmed`, or `expired`
+- **Status filter:** filter by `pending`, `confirming`, `partial`, `confirmed`, `reverted`, or `expired`
 - **Transaction detail:** click any transaction to see full details (subaddress, tx hash, confirmations, donor info)
 - **CSV export:** download all transactions as a CSV file with the **Export** button
 
@@ -49,9 +49,9 @@ The transactions page (`/admin/transactions`) gives you:
 
 On the widgets page (`/admin/widgets`) you can:
 
-- **View all widgets:** see name, mode, theme, and creation date
-- **Create a widget:** set name, mode, preset amounts, button text, colors, and redirect URL
-- **Delete a widget:** delete the widget (Tiponero keeps the existing transactions and sets `widget_id` to NULL)
+- **Create a widget:** full-width form with mode, price, confirmations, goal, and appearance
+- **Preview and edit:** expand a widget to see it live, edit every field, and copy the embed code
+- **Delete a widget:** Tiponero keeps the existing transactions and sets `widget_id` to NULL
 
 ## Navigation
 
@@ -61,5 +61,6 @@ On the widgets page (`/admin/widgets`) you can:
 | `/admin/transactions` | Transaction list |
 | `/admin/transactions/{id}` | Transaction detail |
 | `/admin/widgets` | Widget list |
-| `/admin/settings` | Settings (profile, password, wallet, 2FA, API keys) |
+| `/admin/notifications` | Webhooks and notification channels |
+| `/admin/settings` | Settings (profile, wallet, account security, API keys) |
 | `/admin/login` | Login page |

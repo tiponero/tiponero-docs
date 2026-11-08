@@ -20,7 +20,7 @@ Stagenet uses different default ports, so a stagenet node does not conflict with
 |---|---|---|
 | monerod P2P | 18080 | 38080 |
 | monerod RPC | 18081 | 38081 |
-| monero-wallet-rpc | 18083 | 38083 |
+| monero-wallet-rpc | 18088 | 38088 |
 
 ## Start a Stagenet Daemon
 
@@ -55,7 +55,7 @@ Paste your stagenet wallet address and you will receive test XMR in a few minute
 monero-wallet-rpc \
   --stagenet \
   --rpc-bind-ip=127.0.0.1 \
-  --rpc-bind-port=38083 \
+  --rpc-bind-port=38088 \
   --rpc-login=rpc_user:rpc_password \
   --daemon-address=127.0.0.1:38081 \
   --daemon-login=rpc_user:rpc_password \
@@ -80,7 +80,7 @@ Then configure the wallet connection in **Settings > Wallet**:
 
 | Field | Value |
 |---|---|
-| RPC URL | `http://127.0.0.1:38083/json_rpc` |
+| RPC URL | `http://127.0.0.1:38088/json_rpc` |
 | RPC Username | `rpc_user` |
 | RPC Password | `rpc_password` |
 | Wallet File | `stagenet_wallet` |

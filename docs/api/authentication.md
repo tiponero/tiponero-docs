@@ -112,4 +112,4 @@ For list endpoints:
 
 ## Rate Limiting
 
-The API has no rate limit. If you make the API public, set a rate limit in your reverse proxy (nginx, Caddy, or Cloudflare).
+The API allows 240 requests per minute per IP. The limit is in memory and resets on restart. Add a reverse proxy limit if the instance is public.

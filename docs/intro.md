@@ -21,10 +21,14 @@ Tiponero changes this. Each transaction gets a unique subaddress. Tiponero shows
 - **Embeddable widget:** add an iframe to any page. Tiponero makes a unique QR code for each payment and detects the payment in real time.
 - **SVG badge:** embed a live donation badge in any Markdown document or website.
 - **Admin panel:** track transactions, manage many widgets, and monitor your setup from a private dashboard.
-- **Developer REST API:** full CRUD for widgets, transactions, wallet configuration, user profiles, and API keys.
+- **Developer REST API:** create payment requests, read transactions, and manage widgets, the wallet, and API keys.
+- **Signed webhooks:** HMAC-SHA256 deliveries with retries and a delivery log.
+- **Notification channels:** Telegram, Discord, Slack, ntfy, WhatsApp, and email over SMTP.
+- **Per-widget confirmations:** from 0-conf to 60 blocks, with a revert event for 0-conf payments.
+- **Fiat pricing and donation goals:** a payment widget can hold a fiat price, and a donation widget can show a goal.
 - **TOTP two-factor authentication:** protect your admin panel with time-based one-time passwords.
-- **Fiat conversion:** automatic XMR-to-fiat snapshots from CoinGecko at transaction creation.
 - **Fully self-hosted:** you run it on your infrastructure. No cloud, no account.
+- **No third-party assets:** fonts, icons, and scripts come from your own server.
 - **MIT license:** read it, audit it, fork it.
 
 ## Who This Is For

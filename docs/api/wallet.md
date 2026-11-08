@@ -32,7 +32,7 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 {
   "data": {
     "id": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f90",
-    "rpc_url": "http://127.0.0.1:18083/json_rpc",
+    "rpc_url": "http://127.0.0.1:18088",
     "rpc_user": "rpc_user",
     "wallet_file": "wallet",
     "connected": true,
@@ -85,7 +85,7 @@ curl -X POST \
   -H "Authorization: Bearer tip_<your_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "rpc_url": "http://127.0.0.1:18083/json_rpc",
+    "rpc_url": "http://127.0.0.1:18088",
     "rpc_user": "rpc_user",
     "rpc_password": "rpc_password",
     "wallet_file": "wallet",
@@ -121,7 +121,7 @@ curl -X PATCH \
   -H "Authorization: Bearer tip_<your_api_key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "rpc_url": "http://127.0.0.1:18083/json_rpc",
+    "rpc_url": "http://127.0.0.1:18088",
     "rpc_user": "new_user",
     "wallet_file": "new_wallet"
   }' \
@@ -134,7 +134,7 @@ curl -X PATCH \
 {
   "data": {
     "id": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f90",
-    "rpc_url": "http://127.0.0.1:18083/json_rpc",
+    "rpc_url": "http://127.0.0.1:18088",
     "rpc_user": "new_user",
     "wallet_file": "new_wallet",
     "connected": false,

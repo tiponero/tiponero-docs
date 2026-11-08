@@ -15,6 +15,7 @@ The `ENCRYPTION_KEY` environment variable is the master secret. The application 
 |---|---|---|
 | Session key | `"session"` | Signs and encrypts session cookies |
 | Wallet key | `"wallet"` | Encrypts wallet RPC passwords at rest (AES-256-GCM) |
+| Notification key | `"notifications"` | Encrypts webhook signing secrets and channel credentials (AES-256-GCM) |
 
 ### Generating a Key
 
@@ -84,7 +85,7 @@ Set `BASE_URL` to an `https://` URL in production. With this setting, cookies tr
 | Service | Recommended Bind | Exposed To |
 |---|---|---|
 | Tiponero | `127.0.0.1:<port>` | Reverse proxy only |
-| monero-wallet-rpc | `127.0.0.1:18083` | Tiponero only |
+| monero-wallet-rpc | `127.0.0.1:18088` | Tiponero only |
 | monerod RPC | `127.0.0.1:18081` | monero-wallet-rpc only |
 | monerod P2P | `0.0.0.0:18080` | Internet (required for sync) |
 

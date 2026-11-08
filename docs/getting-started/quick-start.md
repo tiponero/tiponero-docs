@@ -86,7 +86,7 @@ Go to **Settings > Wallet** and enter your `monero-wallet-rpc` connection detail
 
 | Field | Description |
 |---|---|
-| RPC URL | For example, `http://127.0.0.1:18083/json_rpc` |
+| RPC URL | For example, `http://127.0.0.1:18088` |
 | RPC Username | Your `monero-wallet-rpc` `--rpc-login` username |
 | RPC Password | Your `monero-wallet-rpc` `--rpc-login` password |
 | Wallet File | Name of the wallet file on the `monero-wallet-rpc` host |

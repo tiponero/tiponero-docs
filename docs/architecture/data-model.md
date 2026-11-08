@@ -5,7 +5,7 @@ sidebar_position: 5
 
 # Data Model
 
-Tiponero Core stores all state in one SQLite database. This document describes the five tables and their columns. It also describes the table relations and the conventions that the code applies to each value.
+Tiponero Core stores all state in one SQLite database. This document describes the eight tables and their columns. It also describes the table relations and the conventions that the code applies to each value.
 
 **Audience:** maintainers and operators.
 
@@ -20,9 +20,9 @@ Tiponero Core stores all state in one SQLite database. This document describes t
 | File | `DATABASE_PATH`, default empty |
 | Journal mode | WAL |
 | Foreign keys | `PRAGMA foreign_keys=ON` after open |
-| Tables | `user`, `widget`, `transaction`, `wallet`, `api_key` |
+| Tables | `user`, `widget`, `transaction`, `wallet`, `api_key`, `webhook`, `notification_channel`, `notification_delivery` |
 | Schema owner | `internal/database/sqlite.go` |
-| Migrations | None. `CREATE TABLE IF NOT EXISTS` on every start |
+| Migrations | Automatic. `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE` on every start |
 
 The schema supports multiple users, but the application serves one user. `GetUser()` reads the first row with `LIMIT 1`. The startup code creates one admin when the table is empty. All widgets, transactions, wallets, and API keys belong to that user.
 
@@ -165,7 +165,7 @@ The application reads this table with `SELECT ... FROM user LIMIT 1`. Most pages
 | `received_amount` | INTEGER | No | `0` | Total received in piconero. `0` before the monitor sees a transfer |
 | `fiat_amount` | REAL | Yes | NULL | Fiat value at creation. `0` for an open-amount donation |
 | `fiat_currency` | TEXT | Yes | NULL | Currency code, for example `USD` |
-| `status` | TEXT | No | `pending` | `pending`, `mempool`, `confirming`, `underpaid`, `confirmed`, or `expired` |
+| `status` | TEXT | No | `pending` | `pending`, `mempool`, `confirming`, `partial`, `confirmed`, `reverted`, or `expired` |
 | `confirmations` | INTEGER | Yes | `0` | Last observed confirmation count |
 | `is_payment` | INTEGER | No | `0` | Boolean. The application copies it from the widget mode at creation |
 | `donor_name` | TEXT | Yes | NULL | Optional visitor name. Donation mode only |
@@ -279,7 +279,7 @@ Unit conversion:
 | Transaction created | New row with status `pending`, `expires_at` set |
 | Payment detected | `status`, `confirmations`, `received_amount`, `tx_hash`, and `updated_at` change |
 | Confirmation reached | `status` becomes `confirmed`, `confirmed_at` gets the current time |
-| Expiry reached | `status` becomes `expired` for rows in `pending` or `underpaid` |
+| Expiry reached | `status` becomes `expired` for rows in `pending` or `partial` |
 | Widget deleted | `transaction.widget_id` becomes NULL, transaction rows remain |
 | API key expires | Row remains. The authenticator rejects the key |
 | Admin deletes an API key | The application removes the row |
@@ -363,3 +363,13 @@ A transaction from that widget:
 - [Flows and Business Logic](/docs/architecture/flows)
 - [System Architecture](/docs/architecture/system-architecture)
 - [Architecture Overview](/docs/architecture/overview)
+
+## Notification tables
+
+| Table | Purpose |
+|---|---|
+| `webhook` | One row per HTTP endpoint. `secret_enc` holds an AES-256-GCM ciphertext because HMAC signing needs the raw value |
+| `notification_channel` | One row per chat or email destination. `config_enc` holds encrypted provider credentials |
+| `notification_delivery` | The outbox: one row per delivery chain, with `status`, `attempts`, `response_code`, and `next_retry_at` |
+
+See [Notifications](/docs/admin/notifications) for the event list and the signature format.

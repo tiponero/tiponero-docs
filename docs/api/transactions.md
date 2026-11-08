@@ -5,7 +5,7 @@ title: Transactions
 
 # Transactions API
 
-You can query payment and donation transaction records. Tiponero creates a transaction automatically when a user interacts with a widget. The API gives read-only access to transaction data.
+You can create payment requests and query transaction records. See [Payment Requests](./payment-requests.md) for creation. This page covers reading.
 
 ## List Transactions
 
@@ -21,7 +21,7 @@ The response contains a paginated list of transactions. You can add an optional 
 |---|---|---|---|
 | `page` | integer | `1` | Page number (1-indexed) |
 | `limit` | integer | `20` | Number of results per page (max 100) |
-| `status` | string | *all* | Filter by status: `pending`, `mempool`, `confirming`, `confirmed`, `expired` |
+| `status` | string | *all* | Filter by status: `pending`, `mempool`, `confirming`, `partial`, `confirmed`, `reverted`, `expired` |
 
 **Example:**
 
@@ -139,7 +139,7 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 | `amount_xmr` | string | Amount as an XMR string |
 | `fiat_amount` | number\|null | Fiat equivalent when Tiponero creates the transaction |
 | `fiat_currency` | string\|null | ISO 4217 currency code (for example, `"USD"`) |
-| `status` | string | `pending`, `mempool`, `confirming`, `confirmed`, or `expired` |
+| `status` | string | `pending`, `mempool`, `confirming`, `partial`, `confirmed`, `reverted`, or `expired` |
 | `confirmations` | integer | Current number of block confirmations |
 | `is_payment` | boolean | `false` for donations, `true` for fixed-amount payments |
 | `donor_name` | string\|null | Optional name from the donor |

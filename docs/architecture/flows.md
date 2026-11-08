@@ -111,7 +111,7 @@ Rules:
 - The session lifetime is 7 days.
 - `POST /admin/logout` destroys the session.
 - Every other `/admin` route redirects to `/admin/login` when the session is missing.
-- The login form has no rate limit and no account lockout.
+- The login form is rate limited per IP. There is no account lockout.
 
 TOTP setup:
 
@@ -333,8 +333,8 @@ The status fragment contains no polling attributes for `confirmed` and `expired`
 
 The monitor runs in one goroutine with a 30 second ticker. Each cycle does these steps:
 
-1. Set `status = expired` for rows with `status` in `pending` or `underpaid` and `expires_at < now`.
-2. Load rows with status `pending`, `mempool`, `confirming`, or `underpaid`.
+1. Set `status = expired` for rows with `status` in `pending` or `partial` and `expires_at < now`.
+2. Load rows with status `pending`, `mempool`, `confirming`, `partial`, or `reverted`.
 3. Stop when the list is empty.
 4. Stop when the wallet RPC URL is empty.
 5. Call `get_transfers` with `in`, `pending`, and `pool` set to true.
@@ -348,7 +348,7 @@ Status resolution:
 
 | Condition | Status |
 |---|---|
-| Received amount is below `amount` for a fixed-amount transaction | `underpaid` |
+| Received amount is below `amount` for a fixed-amount transaction | `partial` |
 | Received amount covers `amount`, 0 confirmations | `mempool` |
 | Received amount covers `amount`, 1 to `CONFIRMATIONS - 1` confirmations | `confirming` |
 | Received amount covers `amount`, `CONFIRMATIONS` or more confirmations | `confirmed` |
@@ -362,7 +362,7 @@ The monitor requires the received amount to cover the requested amount. It does 
 ### 6.6 Confirmation and redirect
 
 - The transaction becomes `confirmed` when the received amount covers `amount` and the confirmation count reaches `CONFIRMATIONS`. The default is 10.
-- An underpayment sets `underpaid`. The page shows the required and received amounts. The visitor can send the remaining amount to the same address.
+- A transfer below the requested amount sets `partial`. The page shows the required and received amounts. The visitor can send the remaining amount to the same address.
 - The payment page shows "Thank you!" for a donation and "Payment confirmed!" for a payment.
 - A redirect happens only during a status poll. The visitor must keep the page open.
 - When the visitor closes the page, the monitor still confirms the transaction. No redirect happens.
@@ -370,7 +370,7 @@ The monitor requires the received amount to cover the requested amount. It does 
 
 ### 6.7 Expiry
 
-- Expiry applies to rows in `pending` and `underpaid`.
+- Expiry applies to rows in `pending` and `partial`.
 - The sweep runs every 30 seconds. A row can expire up to 30 seconds after `expires_at`.
 - An expired row is no longer in the active set. A payment to its subaddress after expiry is not detected and not recorded.
 - Rows in `mempool` or `confirming` have no expiry. A transfer that stays in the mempool keeps the transaction and the page active. The page shows the normal waiting state. There is no "stuck" label.
@@ -382,40 +382,44 @@ The monitor requires the received amount to cover the requested amount. It does 
 stateDiagram-v2
     direction LR
     [*] --> pending : Row inserted
-    pending --> underpaid : Transfer below requested amount
+    pending --> partial : Transfer below requested amount
     pending --> mempool : Transfer covers amount, 0 confirmations
     pending --> confirming : Transfer covers amount, 1 or more confirmations
-    pending --> confirmed : Transfer covers amount and threshold is 1
+    pending --> confirmed : Transfer covers amount and threshold is 0 or 1
     pending --> expired : expires_at passed
-    underpaid --> mempool : Top-up covers amount, 0 confirmations
-    underpaid --> confirming : Top-up covers amount, 1 or more confirmations
-    underpaid --> confirmed : Top-up covers amount and threshold reached
-    underpaid --> expired : expires_at passed
+    partial --> mempool : Top-up covers amount, 0 confirmations
+    partial --> confirming : Top-up covers amount, 1 or more confirmations
+    partial --> confirmed : Top-up covers amount and threshold reached
+    partial --> expired : expires_at passed
     mempool --> confirming : Confirmations reach 1
     mempool --> confirmed : Confirmations reach threshold
     confirming --> confirmed : Confirmations reach threshold
     confirming --> mempool : Reorg back to 0 confirmations
+    confirmed --> reverted : 0-conf transfer leaves the mempool
+    reverted --> confirmed : Transfer reappears
     confirmed --> [*]
+    reverted --> [*]
     expired --> [*]
 ```
 
 | State | Meaning | Terminal |
 |---|---|---|
 | `pending` | Row exists, no transfer seen | No |
-| `underpaid` | Transfer seen, total below the requested amount | No |
+| `partial` | Transfer seen, total below the requested amount | No |
 | `mempool` | Transfer covers the amount, 0 confirmations | No |
 | `confirming` | Transfer covers the amount, 1 or more confirmations, below threshold | No |
-| `confirmed` | Amount covered and confirmation threshold reached | Yes |
+| `confirmed` | Amount covered and confirmation threshold reached | Yes, except for 0-conf |
+| `reverted` | A 0-conf payment left the mempool inside the revert window | No |
 | `expired` | No sufficient payment before `expires_at` | Yes |
 
 Notes:
 
 - The monitor derives the state from the received amount and the confirmation count on every poll. It does not keep a separate history.
-- A top-up can move `underpaid` to `mempool`, `confirming`, or `confirmed`.
-- A chain reorganization can lower the count for an active row. A dropped transfer can lower the total and move an active row to `underpaid`.
+- A top-up can move `partial` to `mempool`, `confirming`, or `confirmed`.
+- A chain reorganization can lower the count for an active row. A dropped transfer can lower the total and move an active row to `partial`.
 - `confirmed` is final because the row leaves the active set. A later reorganization does not change it.
 - `expired` is final because the row also leaves the active set.
-- `pending` and `underpaid` rows expire. There is no timeout for `mempool` or `confirming`.
+- `pending` and `partial` rows expire. There is no timeout for `mempool` or `confirming`.
 - The widget confirmation bar uses `CONFIRMATIONS`.
 
 ## 8. Badge flow
@@ -479,7 +483,7 @@ Rules:
 - A valid request updates `last_used_at` in a background goroutine. The response does not wait for the write.
 - The handler receives the user ID from the key, not from the request body.
 - The API sends no CORS headers. Browser clients on another origin cannot call it.
-- There is no rate limit.
+- The API is rate limited per IP (240 requests per minute).
 
 Response conventions:
 
@@ -508,7 +512,7 @@ Create API keys in the admin settings page. The page shows the raw key once. The
 Dashboard statistics:
 
 - Total received: count and sum of the effective received amount for confirmed rows. The effective value is `COALESCE(NULLIF(received_amount, 0), amount)`.
-- Pending: count of rows in `pending`, `mempool`, `confirming`, and `underpaid`.
+- Pending: count of rows in `pending`, `mempool`, `confirming`, and `partial`.
 - Today: count and sum for confirmed rows with `confirmed_at` at or after UTC midnight.
 
 The CSV columns are: ID, Type, Amount (XMR), Received (XMR), Fiat Amount, Fiat Currency, Status, Donor, Note, TX Hash, Created, Confirmed.
@@ -526,7 +530,7 @@ The CSV columns are: ID, Type, Amount (XMR), Received (XMR), Fiat Amount, Fiat C
 | CoinGecko fails with a cached price | Stale price snapshot | Transaction row remains |
 | Status request uses the wrong widget ID | HTTP 404 | None |
 | Transfer never arrives | Page shows expired after `TRANSACTION_EXPIRY` | Row becomes `expired` |
-| Transfer is below the requested amount | Page shows underpaid, with required and received amounts | Row becomes `underpaid`, not confirmed |
+| Transfer is below the requested amount | Page shows partial, with required and received amounts | Row becomes `partial`, not confirmed |
 | Transfer arrives after expiry | No change, the page shows expired | Row stays `expired` |
 | Wallet RPC fails during a poll | Status stays at the last value | Next poll retries |
 | Wallet RPC call exceeds 30 s | Request fails with a timeout error | Check the RPC and the network |
@@ -556,15 +560,15 @@ The CSV columns are: ID, Type, Amount (XMR), Received (XMR), Fiat Amount, Fiat C
 1. The app stores the requested amount in `amount` and the total received amount in `received_amount`. For an open-amount donation, `amount` is `0` and `received_amount` is the actual transfer total.
 2. Statistics and the badge use the received amount for confirmed rows. Rows confirmed by an older version have `received_amount = 0`, so the queries fall back to the requested amount.
 3. Payment mode enforces the widget preset on the server. The app ignores the form amount. A crafted request cannot create a transaction with a different amount.
-4. The monitor sums all transfers to the subaddress and requires the total to cover the requested amount. An underpayment sets `underpaid` and is never confirmed.
+4. The monitor sums all transfers to the subaddress and requires the total to cover the requested amount. A transfer below the requested amount sets `partial` and is never confirmed.
 5. Expired transactions leave the active set. A late payment to an expired subaddress is not detected. This is intentional.
-6. `pending` and `underpaid` rows expire. A transfer that stays in the mempool keeps the row and the page active without a timeout. The page shows the normal waiting state. There is no "stuck" label.
+6. `pending` and `partial` rows expire. A transfer that stays in the mempool keeps the row and the page active without a timeout. The page shows the normal waiting state. There is no "stuck" label.
 7. The widget confirmation bar uses `CONFIRMATIONS`.
 8. The widget page renders `thank_you_message` after confirmation. The admin form sets a default by mode. The API accepts the value from the request.
-9. The admin UI cannot edit a widget. Use the REST API for updates.
+9. The admin UI and the REST API can both edit a widget. Both paths validate the same rules.
 10. The application serves one user. `GetUser()` reads the first row only.
-11. Admin forms have no CSRF token. The session cookie uses `SameSite=Lax`.
-12. There is no rate limit on login, widget creation, or API calls.
+11. Admin forms carry a CSRF token that matches the `tiponero_csrf` cookie. The session cookie uses `SameSite=Lax`.
+12. A per-IP rate limiter covers login, widget creation, the admin panel, and the API.
 13. The schema has no migrations. Existing databases need `ALTER TABLE "transaction" ADD COLUMN received_amount INTEGER NOT NULL DEFAULT 0` before the new binary starts.
 14. `get_transfers` returns every transfer of the wallet. The monitor deduplicates by transaction hash and subaddress index, then sums by subaddress.
 15. A chain reorganization can lower the state of an active transaction. A confirmed transaction is no longer polled and keeps its state.

@@ -77,3 +77,15 @@ This design keeps the sensitive wallet credentials out of the environment files 
 | `CONFIRMATIONS` | `10` is a good default. Use a lower value for small donations and a higher value for large payments. |
 | `TRANSACTION_EXPIRY` | `1h` works for most use cases. Increase it for payment flows where users need more time. |
 | `DATABASE_PATH` | Use an absolute path on a persistent volume. Back up this file regularly. |
+
+## Notification and pricing options
+
+| Variable | Default | Description |
+|---|---|---|
+| `COINMARKETCAP_API_KEY` | unset | Fallback price provider when CoinGecko fails |
+| `MOCK_PAYMENTS` | `false` | Adds a "Simulate payment" button in the admin panel. Test rows are excluded from statistics and CSV export |
+| `TRUST_PROXY` | `false` | Trust `X-Forwarded-For` from a reverse proxy for rate limiting. Enable only behind a proxy you control |
+
+## Tor
+
+`HTTPS_PROXY` and `NO_PROXY` are read by the Go HTTP client. Set `HTTPS_PROXY=socks5://127.0.0.1:9050` to send the price request through Tor. See [Tor](../deployment/tor.md).

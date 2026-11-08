@@ -35,12 +35,12 @@ These pages explain how Tiponero Core works: the parts of a deployed system, the
 | Wallet RPC | The `monero-wallet-rpc` process that holds the wallet keys |
 | Monitor | Background goroutine that polls the wallet every 30 seconds |
 | Confirmation | A block added after the block that contains the transaction |
-| Underpaid | Status of a transaction when the received amount is below the requested amount |
+| Partial | Status of a transaction when the received amount is below the requested amount |
 | Badge | SVG image with a QR code and live statistics |
 
 The UI shows amounts in XMR. The database stores them in piconero. The database stores widget preset amounts in XMR. Each page gives the unit with the value.
 
-Transaction status values are always lowercase: `pending`, `mempool`, `confirming`, `underpaid`, `confirmed`, `expired`.
+Transaction status values are always lowercase: `pending`, `mempool`, `confirming`, `partial`, `confirmed`, `expired`.
 
 ## Source of Truth
 

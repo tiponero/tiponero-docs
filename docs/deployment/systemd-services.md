@@ -23,7 +23,7 @@ User=monero
 WorkingDirectory=/var/lib/monero
 ExecStart=/usr/bin/monero-wallet-rpc \
   --rpc-bind-ip=127.0.0.1 \
-  --rpc-bind-port=18083 \
+  --rpc-bind-port=18088 \
   --rpc-login=rpc_user:rpc_password \
   --daemon-address=node.moneroworld.com:18089 \
   --wallet-file=/var/lib/monero/wallet \
@@ -82,7 +82,7 @@ User=monero
 WorkingDirectory=/var/lib/monero
 ExecStart=/usr/bin/monero-wallet-rpc \
   --rpc-bind-ip=127.0.0.1 \
-  --rpc-bind-port=18083 \
+  --rpc-bind-port=18088 \
   --rpc-login=rpc_user:rpc_password \
   --daemon-address=127.0.0.1:18081 \
   --daemon-login=rpc_user:rpc_password \
@@ -107,8 +107,8 @@ sudo systemctl enable --now monero-wallet-rpc
 |---|---|---|---|
 | 18080 | monerod P2P | Inbound | Local node only. Open in firewall for blockchain sync. |
 | 18081 | monerod RPC | Local only | Local node only. Used by `monero-wallet-rpc`. Do not expose. |
-| 18083 | monero-wallet-rpc | Local only | Used by Tiponero. Do not expose. |
+| 18088 | monero-wallet-rpc | Local only | Used by Tiponero. Do not expose. |
 
 :::tip
-With a remote node, you do not open inbound ports. Only port 18083 matters, and it is bound to localhost. With a local node, the internet must reach port 18080 (P2P) for the blockchain sync.
+With a remote node, you do not open inbound ports. Only port 18088 matters, and it is bound to localhost. With a local node, the internet must reach port 18080 (P2P) for the blockchain sync.
 :::

@@ -9,7 +9,7 @@ Tiponero connects to `monero-wallet-rpc`, and `monero-wallet-rpc` connects to a 
 
 ```mermaid
 flowchart LR
-    Monerod["monerod\n(local or remote)"] --> WalletRPC["monero-wallet-rpc\n(view-only wallet)\nport 18083"]
+    Monerod["monerod\n(local or remote)"] --> WalletRPC["monero-wallet-rpc\n(view-only wallet)\nport 18088"]
     WalletRPC --> Tiponero["Tiponero\nport 8080"]
 ```
 
@@ -87,7 +87,7 @@ Start `monero-wallet-rpc` with a remote daemon:
 ```bash
 monero-wallet-rpc \
   --rpc-bind-ip=127.0.0.1 \
-  --rpc-bind-port=18083 \
+  --rpc-bind-port=18088 \
   --rpc-login=rpc_user:rpc_password \
   --daemon-address=node.moneroworld.com:18089 \
   --wallet-file=/path/to/wallet_view_only \
@@ -122,7 +122,7 @@ Then start `monero-wallet-rpc` and point it at your local daemon:
 ```bash
 monero-wallet-rpc \
   --rpc-bind-ip=127.0.0.1 \
-  --rpc-bind-port=18083 \
+  --rpc-bind-port=18088 \
   --rpc-login=rpc_user:rpc_password \
   --daemon-address=127.0.0.1:18081 \
   --daemon-login=rpc_user:rpc_password \
@@ -136,7 +136,7 @@ monero-wallet-rpc \
 Make sure that `monero-wallet-rpc` answers:
 
 ```bash
-curl -s -X POST http://127.0.0.1:18083/json_rpc \
+curl -s -X POST http://127.0.0.1:18088/json_rpc \
   --digest -u rpc_user:rpc_password \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":"0","method":"get_height"}' | python3 -m json.tool
@@ -153,6 +153,72 @@ Expected response:
     }
 }
 ```
+
+## Troubleshooting
+
+### The Monero GUI is running, but nothing listens on the RPC port
+
+The GUI starts `monerod`, not `monero-wallet-rpc`. The GUI application links the wallet code directly and never opens a JSON-RPC server. The full GUI manual has no RPC section at all.
+
+**Merchant mode is not an RPC server.** The GUI has a Merchant tab that creates payment requests and watches incoming transfers. It runs inside the GUI window. It does not listen on a port, and no other program can call it.
+
+The GUI release does ship the binary, which is why people remember starting it "from the GUI". Look next to the GUI executable:
+
+```text
+monero-gui-v0.18.x/
+├── monerod
+├── monero-wallet-gui
+└── extras/
+    ├── monero-wallet-cli
+    └── monero-wallet-rpc
+```
+
+On Windows the default install folder is `C:\Program Files\Monero GUI Wallet\`, and `monero-wallet-rpc.exe` is in it.
+
+Start it yourself:
+
+```bash
+./extras/monero-wallet-rpc \
+  --wallet-dir=/path/to/wallets \
+  --rpc-bind-port=18088 \
+  --rpc-login=rpc_user:rpc_password \
+  --daemon-address=127.0.0.1:18081
+```
+
+If the GUI uses a remote node, pass that node's address instead, usually on port `18089` (restricted RPC).
+
+:::warning
+Do not point `monero-wallet-rpc` at the same wallet file that the GUI has open. Two processes writing one wallet file cause lock and sync problems. The Monero documentation recommends two wallet files for the same keys: one for the GUI, one for the RPC.
+
+For Tiponero the better option is a view-only wallet. Export the address and private view key from the GUI under **Settings > Seeds & Keys**, then let Tiponero create a separate view-only wallet file with **Settings > Create a View-Only Wallet**. The GUI keeps the only copy of the spend key.
+:::
+
+### Which port should I use?
+
+`monero-wallet-rpc` has no default port. You choose one with `--rpc-bind-port`. Monero reserves these ports on mainnet:
+
+| Port | Service |
+|---|---|
+| 18081 | `monerod` unrestricted JSON-RPC |
+| 18082 | `monerod` ZMQ RPC |
+| 18083 | `monerod` ZMQ Pub |
+| 18088 | Wallet RPC (reserved for this use) |
+| 18089 | `monerod` restricted JSON-RPC |
+
+Port `18083` is the ZMQ publisher. It is not the wallet RPC and it does not answer JSON-RPC requests. Use `18088` unless you already run something there.
+
+On stagenet, the same ports shift by 20000: wallet RPC is `38088`.
+
+### Connection errors
+
+| Error | Cause |
+|---|---|
+| `connection refused` | `monero-wallet-rpc` is not running, or it listens on a different port |
+| `401 Unauthorized` | The user name or password does not match `--rpc-login` |
+| `404 Not Found` | The URL already ends in `/json_rpc` and the client adds it again |
+| `Method not found` | The URL points at `monerod` instead of `monero-wallet-rpc` |
+
+In the admin panel, enter the base address only: `http://127.0.0.1:18088`. Tiponero appends `/json_rpc` itself. A pasted `http://127.0.0.1:18088/json_rpc` also works now, because the client removes the suffix.
 
 ## Next Steps
 

@@ -27,7 +27,7 @@ Change your admin password:
 1. Enter your current password
 2. Enter the new password
 3. Confirm the new password
-4. Click **Update Password**
+4. Click **Update password**
 
 Tiponero hashes the passwords with bcrypt at the default cost factor.
 
@@ -37,7 +37,7 @@ Configure the connection to your `monero-wallet-rpc` instance:
 
 | Field | Description |
 |---|---|
-| **RPC URL** | JSON-RPC endpoint (for example, `http://127.0.0.1:18083/json_rpc`) |
+| **RPC URL** | Base URL of the RPC (for example, `http://127.0.0.1:18088`). Tiponero appends `/json_rpc` |
 | **RPC Username** | HTTP Digest Auth username for `monero-wallet-rpc` |
 | **RPC Password** | HTTP Digest Auth password (encrypted at rest with AES-256-GCM) |
 | **Wallet File** | Name of the wallet file on the RPC host |
@@ -49,11 +49,11 @@ After you save, Tiponero **hot-swaps** the RPC client immediately. The dashboard
 Tiponero encrypts the wallet passwords before storage. It uses AES-256-GCM with a key that comes from the `ENCRYPTION_KEY` environment variable. After you save a password, the UI and the API responses never show it.
 :::
 
-## Two-Factor Authentication (TOTP)
+## Account Security
 
 ### Enabling 2FA
 
-1. Click **Setup 2FA** in the settings page
+1. Click **Enable 2FA** in the Account Security card
 2. Scan the QR code with your authenticator app (Google Authenticator, Authy, and other apps)
 3. Enter the 6-digit code displayed in your authenticator
 4. Click **Confirm**
@@ -78,3 +78,9 @@ When 2FA is enabled, the login flow adds a second step:
 ## API Keys
 
 See [API Keys](/docs/admin/api-keys) for how to create and manage API keys.
+
+## Create a View-Only Wallet
+
+The **Create view-only wallet** section of the Wallet card builds the wallet for you. Fill in the RPC fields, the primary address, the private view key, and a file name, then click **Create wallet**. Tiponero calls `generate_from_keys` on `monero-wallet-rpc` with no spend key, which creates a view-only wallet, then opens it and saves the connection.
+
+The private view key goes to the wallet RPC and is never written to the database. Tiponero stores only the RPC URL, the user name, the wallet file name, and the encrypted passwords.

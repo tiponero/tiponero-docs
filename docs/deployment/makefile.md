@@ -66,7 +66,7 @@ The Makefile starts each tool from the `tools` module. The versions of templ, Ai
 | Target | Command | Description |
 |---|---|---|
 | `make generate` | `go -C tools tool templ generate -path ..` | Compile `.templ` templates to Go, with the templ version from `tools/go.mod` |
-| `make css` | `tailwindcss -i ... -o ... --minify` | Compile and minify Tailwind CSS |
+| `make css` | `tailwindcss -i ... -o ... --minify` | Compile and minify Tailwind CSS. If `tailwindcss` is not on `PATH`, the target downloads the pinned standalone binary into `bin/` |
 | `make build` | generate + css + `go build` | Full production build |
 | `make dev` | `go -C tools tool air` | Start with hot-reload (development) |
 | `make lint` | `go -C tools tool golangci-lint run` | Run linter |

@@ -94,7 +94,7 @@ in {
     environment = {
       PORT = "3001";
       DATABASE_PATH = "/var/lib/tiponero/tiponero.db";
-      MONERO_RPC_URL = "http://127.0.0.1:18083/json_rpc";
+      MONERO_RPC_URL = "http://127.0.0.1:18088";
       FIAT_CURRENCY = "USD";
       CONFIRMATIONS = "5";
       BASE_URL = "https://pay.example.com";
@@ -161,7 +161,7 @@ Create `monero.nix` for the full node and the wallet RPC:
       ExecStart = pkgs.writeShellScript "monero-wallet-rpc-start" ''
         exec ${pkgs.monero-cli}/bin/monero-wallet-rpc \
           --rpc-bind-ip=127.0.0.1 \
-          --rpc-bind-port=18083 \
+          --rpc-bind-port=18088 \
           --rpc-login="$MONERO_RPC_USER:$MONERO_RPC_PASSWORD" \
           --daemon-address=127.0.0.1:18081 \
           --daemon-login="$MONERO_RPC_USER:$MONERO_RPC_PASSWORD" \

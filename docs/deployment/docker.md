@@ -56,7 +56,7 @@ services:
     entrypoint: monero-wallet-rpc
     command:
       - --rpc-bind-ip=0.0.0.0
-      - --rpc-bind-port=18083
+      - --rpc-bind-port=18088
       - --confirm-external-bind
       - --rpc-login=rpc_user:rpc_password
       - --daemon-address=monerod:18081
@@ -117,7 +117,7 @@ After the stack starts, configure the wallet connection in the Tiponero admin pa
 
 | Field | Value |
 |---|---|
-| RPC URL | `http://wallet-rpc:18083/json_rpc` |
+| RPC URL | `http://wallet-rpc:18088` |
 | RPC Username | `rpc_user` |
 | RPC Password | `rpc_password` |
 | Wallet File | `wallet` |
