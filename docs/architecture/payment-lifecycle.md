@@ -102,3 +102,7 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 ```
 
 See the [Transactions API Reference](/docs/api/transactions) for full details.
+
+## Full Reference
+
+This page summarizes the states. For each trigger, code path, and failure case, read [Flows and Business Logic](/docs/internals/flows).

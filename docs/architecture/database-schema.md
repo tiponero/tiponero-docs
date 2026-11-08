@@ -230,3 +230,7 @@ erDiagram
 - **UUID v4 primary keys:** generated via SQLite's `randomblob()` function, formatted as standard UUID strings.
 - **Unix timestamps:** all timestamps are stored as `INTEGER` (seconds since epoch). No timezone ambiguity.
 - **WAL mode:** enabled at database open time. Allows concurrent readers during writes, which is important since the payment monitor writes every 30 seconds while the admin panel serves read requests.
+
+## Full Reference
+
+This page summarizes the tables. For each column, index, relation, and storage rule, read [Data Model](/docs/internals/data-model).

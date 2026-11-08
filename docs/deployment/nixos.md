@@ -278,3 +278,9 @@ If running NixOS in a Proxmox LXC container, your `hardware.nix` should include:
 ```
 
 This configuration works with standard unprivileged LXC containers: no special privileges required.
+
+## Build Errors After a nixpkgs Update
+
+The flake takes the templ CLI from nixpkgs, so a nixpkgs update can move the CLI ahead of the Go module in `go.mod`. The build then stops with `undefined: templ.ResolveAttributeValue`.
+
+The [Nix Packaging](/docs/development/nix-packaging) page gives the test command for a specific nixpkgs revision and the update procedure. The [templ Toolchain](/docs/development/templ-toolchain) page gives the version bump steps.

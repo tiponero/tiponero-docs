@@ -12,7 +12,7 @@ Build Tiponero from source using the provided Makefile. This produces a single s
 | Tool | Version | Purpose |
 |---|---|---|
 | [Go](https://go.dev/dl/) | 1.25+ | Compiler (CGO must be enabled) |
-| [templ](https://templ.guide/) | 0.3.x | Template code generation |
+| [templ](https://templ.guide/) | the version in `tools/go.mod` | Template code generation |
 | [Tailwind CSS CLI](https://tailwindcss.com/blog/standalone-cli) | 3.x | CSS compilation |
 | C compiler (gcc/clang) | *any* | Required for CGO (SQLite binding) |
 
@@ -23,8 +23,8 @@ Build Tiponero from source using the provided Makefile. This produces a single s
 # Verify CGO is available:
 go env CGO_ENABLED  # should print "1"
 
-# templ CLI
-go install github.com/a-h/templ/cmd/templ@latest
+# templ CLI (optional: make generate installs the pinned version on demand)
+go -C tools install github.com/a-h/templ/cmd/templ
 
 # Tailwind CSS CLI (via npm)
 npm install -D tailwindcss
@@ -59,15 +59,17 @@ The `make build` target runs three steps:
 
 The output binary is at `bin/tiponero`.
 
+The Makefile runs each tool from the `tools` module. The versions of templ, Air, and golangci-lint come from `tools/go.mod`, not from your `PATH`. Keep the templ version in `tools/go.mod` equal to the `github.com/a-h/templ` version in `go.mod`. See [templ Toolchain](/docs/development/templ-toolchain).
+
 ## Makefile Targets
 
 | Target | Command | Description |
 |---|---|---|
-| `make generate` | `templ generate` | Compile `.templ` templates to Go |
+| `make generate` | `go -C tools tool templ generate -path ..` | Compile `.templ` templates to Go, with the templ version from `tools/go.mod` |
 | `make css` | `tailwindcss -i ... -o ... --minify` | Compile and minify Tailwind CSS |
 | `make build` | generate + css + `go build` | Full production build |
-| `make dev` | `air` | Start with hot-reload (development) |
-| `make lint` | `golangci-lint run` | Run linter |
+| `make dev` | `go -C tools tool air` | Start with hot-reload (development) |
+| `make lint` | `go -C tools tool golangci-lint run` | Run linter |
 | `make clean` | `rm -rf bin/ tmp/ ...` | Remove build artifacts |
 
 ## Running the Binary

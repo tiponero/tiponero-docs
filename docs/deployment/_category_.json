@@ -1,6 +1,6 @@
 {
   "label": "Deployment",
-  "position": 8,
+  "position": 9,
   "link": {
     "type": "generated-index",
     "description": "Guides for deploying Tiponero via Docker, NixOS, bare-metal, and reverse proxies."

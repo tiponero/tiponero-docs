@@ -29,10 +29,12 @@ docs/
   getting-started/          # Overview, Quick Start
   configuration/            # Environment variables
   architecture/             # Tech stack, project structure, database schema, payment lifecycle
+  internals/                # Deep reference: system architecture, data model, flows
   api/                      # REST API reference (auth, widgets, transactions, wallet, stats, keys)
   widgets/                  # Embedding, badge, donation mode, payment mode
   admin/                    # Admin panel usage
   deployment/               # Wallet RPC setup, systemd, stagenet, Makefile, Docker, NixOS, reverse proxy, security
+  development/              # Maintainer notes: templ toolchain, Nix packaging
 src/
   css/custom.css            # Brand colors and fonts
   pages/index.tsx           # Redirect to /docs/intro

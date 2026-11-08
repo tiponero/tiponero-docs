@@ -31,8 +31,8 @@ These are only needed during compilation, not at runtime:
 
 | Tool | Purpose |
 |---|---|
-| **templ CLI** | Compiles `.templ` templates to `*_templ.go` files |
-| **Tailwind CSS CLI v3** | Compiles `input.css` to `output.css` with utility class extraction |
+| **templ CLI** | Compiles `.templ` templates to `*_templ.go` files. The version comes from `tools/go.mod` and must equal the `github.com/a-h/templ` version in `go.mod`. See [templ Toolchain](/docs/development/templ-toolchain). |
+| **Tailwind CSS CLI v3** | Compiles `input.css` to `output.css` with utility class extraction. |
 | **Go (CGO)** | Compiles the application, links SQLite via `go-sqlite3` |
 
 ## Development Tools
