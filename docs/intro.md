@@ -39,7 +39,7 @@ Tiponero fixes this. Each transaction gets a unique subaddress, displayed as a Q
 ## Quick Links
 
 - [Quick Start](/docs/getting-started/quick-start): get a running instance in minutes
-- [Architecture Overview](/docs/getting-started/overview): understand how the pieces fit together
+- [How It Works](/docs/getting-started/overview): the parts of the system in one page
 - [API Reference](/docs/api/authentication): full REST API documentation
 - [Deployment Guides](/docs/deployment/prerequisites): Docker, NixOS, bare-metal deployment, and Monero wallet RPC setup
 - [API Collection](https://github.com/tiponero/tiponero-api-collection): import the full API collection (Bruno, Postman, OpenAPI)

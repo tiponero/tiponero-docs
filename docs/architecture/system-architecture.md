@@ -1,6 +1,6 @@
 ---
 title: System Architecture
-sidebar_position: 2
+sidebar_position: 4
 ---
 
 # System Architecture
@@ -9,7 +9,7 @@ Tiponero Core is a self-hosted Monero payment engine. This document shows the pa
 
 **Audience:** maintainers and operators.
 
-**Scope:** the deployed system and its runtime dependencies. Business flows are in [Flows and Business Logic](/docs/internals/flows). The database schema is in [Data Model](/docs/internals/data-model).
+**Scope:** the deployed system and its runtime dependencies. Business flows are in [Flows and Business Logic](/docs/architecture/flows). The database schema is in [Data Model](/docs/architecture/data-model).
 
 ## 1. At a glance
 
@@ -367,8 +367,8 @@ The config package logs a warning for an empty `DATABASE_PATH` and an empty `ENC
 | `internal/views` | templ templates |
 | `static` | Embedded assets |
 
-## Related documents
+## Related pages
 
-- [Flows](/docs/internals/flows)
-- [Data model](/docs/internals/data-model)
-- [Documentation index](/docs/internals/overview)
+- [Flows and Business Logic](/docs/architecture/flows)
+- [Data Model](/docs/architecture/data-model)
+- [Architecture Overview](/docs/architecture/overview)

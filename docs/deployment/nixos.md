@@ -96,7 +96,7 @@ in {
       DATABASE_PATH = "/var/lib/tiponero/tiponero.db";
       MONERO_RPC_URL = "http://127.0.0.1:18083/json_rpc";
       FIAT_CURRENCY = "USD";
-      REQUIRED_CONFIRMATIONS = "5";
+      CONFIRMATIONS = "5";
       BASE_URL = "https://pay.example.com";
     };
   };

@@ -28,8 +28,7 @@ docs/
   intro.md                  # Landing page
   getting-started/          # Overview, Quick Start
   configuration/            # Environment variables
-  architecture/             # Tech stack, project structure, database schema, payment lifecycle
-  internals/                # Deep reference: system architecture, data model, flows
+  architecture/             # Overview, tech stack, project structure, system architecture, data model, flows
   api/                      # REST API reference (auth, widgets, transactions, wallet, stats, keys)
   widgets/                  # Embedding, badge, donation mode, payment mode
   admin/                    # Admin panel usage

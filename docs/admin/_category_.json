@@ -1,6 +1,6 @@
 {
   "label": "Admin Panel",
-  "position": 8,
+  "position": 7,
   "link": {
     "type": "generated-index",
     "description": "Dashboard, settings, and API key management."

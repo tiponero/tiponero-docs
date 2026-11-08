@@ -3,6 +3,6 @@
   "position": 2,
   "link": {
     "type": "generated-index",
-    "description": "Architecture overview, transaction lifecycle, and quick-start guide."
+    "description": "How the system fits together, and the quick-start guide."
   }
 }

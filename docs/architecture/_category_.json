@@ -2,7 +2,7 @@
   "label": "Architecture",
   "position": 4,
   "link": {
-    "type": "generated-index",
-    "description": "Internals: technology stack, project structure, database schema, and payment lifecycle."
+    "type": "doc",
+    "id": "architecture/overview"
   }
 }

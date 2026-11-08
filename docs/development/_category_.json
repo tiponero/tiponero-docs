@@ -1,6 +1,6 @@
 {
   "label": "Development",
-  "position": 10,
+  "position": 9,
   "link": {
     "type": "generated-index",
     "description": "Maintainer notes for the build: the templ toolchain, version pinning, and Nix packaging."

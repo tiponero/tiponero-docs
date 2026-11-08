@@ -1,6 +1,6 @@
 ---
 title: Flows and Business Logic
-sidebar_position: 4
+sidebar_position: 6
 ---
 
 # Flows and Business Logic
@@ -9,7 +9,7 @@ This document explains what Tiponero Core does, in the order that a user or a ma
 
 **Audience:** maintainers, operators, integrators.
 
-**Scope:** user-visible behavior and the business rules behind it. Runtime parts are in [System Architecture](/docs/internals/system-architecture). The database schema is in [Data Model](/docs/internals/data-model).
+**Scope:** user-visible behavior and the business rules behind it. Runtime parts are in [System Architecture](/docs/architecture/system-architecture). The database schema is in [Data Model](/docs/architecture/data-model).
 
 ## 1. Actors and entry points
 
@@ -573,8 +573,8 @@ The CSV columns are: ID, Type, Amount (XMR), Received (XMR), Fiat Amount, Fiat C
 18. The stored `tx_hash` is the hash of the highest-confirmation transfer. If a subaddress has several transfers, the other hashes are not stored.
 19. An open-amount donation has no fiat snapshot because the amount is unknown at creation. The fiat columns stay `0`.
 
-## Related documents
+## Related pages
 
-- [System architecture](/docs/internals/system-architecture)
-- [Data model](/docs/internals/data-model)
-- [Documentation index](/docs/internals/overview)
+- [System Architecture](/docs/architecture/system-architecture)
+- [Data Model](/docs/architecture/data-model)
+- [Architecture Overview](/docs/architecture/overview)
