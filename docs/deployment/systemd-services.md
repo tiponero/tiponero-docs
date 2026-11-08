@@ -5,11 +5,11 @@ title: Running as systemd Services
 
 # Running as systemd Services
 
-For production deployments, run `monero-wallet-rpc` (and optionally `monerod`) as systemd services so they start automatically and restart on failure.
+For production deployments, run `monero-wallet-rpc` (and optionally `monerod`) as systemd services. The services then start automatically and restart after a failure.
 
 ## Remote Node Setup
 
-If you're using a [remote node](/docs/deployment/prerequisites#option-a-remote-node-recommended), you only need a single service file for `monero-wallet-rpc`:
+If you use a [remote node](/docs/deployment/prerequisites#option-a-remote-node-recommended), you need one service file for `monero-wallet-rpc`:
 
 ```ini title="/etc/systemd/system/monero-wallet-rpc.service"
 [Unit]
@@ -42,7 +42,7 @@ sudo systemctl enable --now monero-wallet-rpc
 
 ## Local Node Setup
 
-If you're running your own [local node](/docs/deployment/prerequisites#option-b-local-node), you need two services. The wallet RPC depends on `monerod`:
+If you run your own [local node](/docs/deployment/prerequisites#option-b-local-node), you need two services. The wallet RPC depends on `monerod`:
 
 ### monerod.service
 
@@ -110,5 +110,5 @@ sudo systemctl enable --now monero-wallet-rpc
 | 18083 | monero-wallet-rpc | Local only | Used by Tiponero. Do not expose. |
 
 :::tip
-With a remote node, no inbound ports need to be opened. Only port 18083 matters, and it's bound to localhost. With a local node, port 18080 (P2P) must be accessible from the internet for blockchain sync.
+With a remote node, you do not open inbound ports. Only port 18083 matters, and it is bound to localhost. With a local node, the internet must reach port 18080 (P2P) for the blockchain sync.
 :::

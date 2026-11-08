@@ -5,34 +5,34 @@ title: Environment Variables
 
 # Environment Variables
 
-Tiponero is configured entirely through environment variables. You can set them directly in your shell, in a `.env` file (loaded automatically via `godotenv`), or through your deployment system (Docker, NixOS, systemd `EnvironmentFile`, etc.).
+Tiponero takes all configuration from environment variables. You can set them in your shell, in a `.env` file that `godotenv` loads automatically, or through your deployment system (Docker, NixOS, systemd `EnvironmentFile`, and others).
 
 ## Reference
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
 | `PORT` | string | `8080` | HTTP listen port. |
-| `BASE_URL` | string | `http://localhost:<PORT>` | Public-facing URL (e.g. `https://pay.example.com`). Used for generating widget URLs, QR codes, and cookie security. If set to an `https://` URL, cookies are marked `Secure`. |
-| `DATABASE_PATH` | string | *in-memory* | Path to the SQLite database file (e.g. `/data/tiponero.db`). If unset, uses an in-memory database (data lost on restart). **Strongly recommended for any non-ephemeral deployment.** |
-| `ENCRYPTION_KEY` | string | *none* | Master key for deriving encryption and session keys via HKDF. Must be at least 32 characters. Used to encrypt wallet RPC passwords at rest (AES-256-GCM). **The application starts without it but logs a warning: sessions and wallet config will not be secure.** |
-| `FIAT_CURRENCY` | string | `USD` | ISO 4217 currency code (e.g. `USD`, `EUR`, `GBP`). XMR amounts are converted to fiat at transaction creation time via CoinGecko. |
-| `CONFIRMATIONS` | integer | `10` | Number of Monero block confirmations required before a transaction is marked `confirmed`. |
-| `TRANSACTION_EXPIRY` | duration | `1h` | Go duration string (e.g. `30m`, `2h`, `45m`). How long a pending transaction remains active before expiring. |
+| `BASE_URL` | string | `http://localhost:<PORT>` | Public URL (for example, `https://pay.example.com`). Tiponero uses it to make widget URLs and QR codes, and to set cookie security. If the URL starts with `https://`, Tiponero marks the cookies `Secure`. |
+| `DATABASE_PATH` | string | *in-memory* | Path to the SQLite database file (for example, `/data/tiponero.db`). If you do not set it, Tiponero uses an in-memory database and loses the data at restart. **Set it for every deployment that must keep data.** |
+| `ENCRYPTION_KEY` | string | *none* | Master key. Tiponero derives the encryption keys and the session keys from it with HKDF. Minimum length 32 characters. Tiponero encrypts the wallet RPC passwords with it at rest (AES-256-GCM). **The application starts without the key but writes a warning: the sessions and the wallet configuration are not secure.** |
+| `FIAT_CURRENCY` | string | `USD` | ISO 4217 currency code (for example, `USD`, `EUR`, `GBP`). Tiponero converts the XMR amounts to fiat at transaction creation through CoinGecko. |
+| `CONFIRMATIONS` | integer | `10` | Number of Monero block confirmations before Tiponero marks a transaction `confirmed`. |
+| `TRANSACTION_EXPIRY` | duration | `1h` | Go duration string (for example, `30m`, `2h`, `45m`). Time before a pending transaction expires. |
 
 :::warning
-While all variables have defaults or are optional, you should always set `DATABASE_PATH` and `ENCRYPTION_KEY` in any real deployment. Running without them means data is lost on restart and wallet credentials are stored insecurely.
+All variables have a default or are optional. But set `DATABASE_PATH` and `ENCRYPTION_KEY` in every real deployment. Without them, you lose the data at restart and Tiponero stores the wallet credentials insecurely.
 :::
 
 ## Example `.env` File
 
-A minimal `.env` file only needs the two variables without built-in defaults:
+A minimal `.env` file needs only the two variables that have no built-in default:
 
 ```bash title=".env"
 DATABASE_PATH=./tiponero.db
 ENCRYPTION_KEY=change-me-to-a-random-32char-key
 ```
 
-A full example overriding all defaults:
+A full example that overrides all defaults:
 
 ```bash title=".env"
 PORT=8080
@@ -46,33 +46,34 @@ TRANSACTION_EXPIRY=1h
 
 ## Key Derivation
 
-The `ENCRYPTION_KEY` is never used directly. Two sub-keys are derived using HKDF-SHA256:
+Tiponero never uses `ENCRYPTION_KEY` directly. It derives two sub-keys with HKDF-SHA256:
 
 | Derived Key | Context | Purpose |
 |---|---|---|
-| Session key | `"session"` | Signs and encrypts session cookies (`gorilla/sessions` CookieStore) |
+| Session key | `"session"` | Signs and encrypts the session cookies (`gorilla/sessions` CookieStore) |
 | Wallet key | `"wallet"` | Encrypts `rpc_password` and `wallet_password` in the database (AES-256-GCM) |
 
 :::warning
-Changing `ENCRYPTION_KEY` after initial setup will:
-- Invalidate all active sessions (users must log in again)
-- Make stored wallet passwords unreadable (you will need to re-enter wallet configuration in Settings)
+If you change `ENCRYPTION_KEY` after the initial setup:
 
-Store this key securely. If you lose it, wallet RPC credentials must be re-configured.
+- All active sessions become invalid. Users must log in again.
+- The stored wallet passwords become unreadable. You must enter the wallet configuration again in Settings.
+
+Store this key in a safe location. If you lose the key, you must configure the wallet RPC credentials again.
 :::
 
 ## Wallet RPC Configuration
 
-The `monero-wallet-rpc` connection details (URL, username, password, wallet file, wallet password) are **not** environment variables. They are configured through the admin panel (**Settings > Wallet**) or the [Wallet API](/docs/api/wallet), and stored encrypted in the database.
+The `monero-wallet-rpc` connection details (URL, username, password, wallet file, wallet password) are **not** environment variables. You set them in the admin panel (**Settings > Wallet**) or through the [Wallet API](/docs/api/wallet). Tiponero stores them encrypted in the database.
 
-This design keeps sensitive wallet credentials out of environment files and process listings.
+This design keeps the sensitive wallet credentials out of the environment files and out of the process listings.
 
 ## Production Recommendations
 
 | Variable | Recommendation |
 |---|---|
-| `BASE_URL` | Set to your public HTTPS URL. This enables secure cookies and correct URL generation. |
-| `ENCRYPTION_KEY` | Generate with `openssl rand -hex 32` or equivalent. Never reuse across instances. |
-| `CONFIRMATIONS` | `10` is a reasonable default. Lower for small donations, higher for large payments. |
-| `TRANSACTION_EXPIRY` | `1h` works for most use cases. Increase for payment flows where users may need more time. |
+| `BASE_URL` | Set it to your public HTTPS URL. This action enables the secure cookies and the correct URL generation. |
+| `ENCRYPTION_KEY` | Make it with `openssl rand -hex 32` or an equivalent command. Never use the same key on two instances. |
+| `CONFIRMATIONS` | `10` is a good default. Use a lower value for small donations and a higher value for large payments. |
+| `TRANSACTION_EXPIRY` | `1h` works for most use cases. Increase it for payment flows where users need more time. |
 | `DATABASE_PATH` | Use an absolute path on a persistent volume. Back up this file regularly. |

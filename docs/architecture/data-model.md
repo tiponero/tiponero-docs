@@ -5,7 +5,7 @@ sidebar_position: 5
 
 # Data Model
 
-Tiponero Core stores all state in one SQLite database. This document describes the five tables, their columns, their relations, and the conventions that the code applies to each value.
+Tiponero Core stores all state in one SQLite database. This document describes the five tables and their columns. It also describes the table relations and the conventions that the code applies to each value.
 
 **Audience:** maintainers and operators.
 
@@ -122,9 +122,9 @@ The relation `widget o|--o{ transaction` shows the nullable `widget_id`. A trans
 | `id` | TEXT | No | UUID v4 | Primary key |
 | `username` | TEXT | No | None | Unique login name |
 | `password_hash` | TEXT | No | None | bcrypt hash, cost 10 |
-| `display_name` | TEXT | Yes | NULL | Shown on public widget pages |
-| `bio` | TEXT | Yes | NULL | Shown on public widget pages |
-| `avatar_url` | TEXT | Yes | NULL | Shown on public widget pages |
+| `display_name` | TEXT | Yes | NULL | The public widget page shows it |
+| `bio` | TEXT | Yes | NULL | The public widget page shows it |
+| `avatar_url` | TEXT | Yes | NULL | The public widget page shows it |
 | `totp_secret` | TEXT | Yes | NULL | TOTP secret in plain text. NULL or empty means 2FA is off |
 | `created_at` | INTEGER | No | None | Unix seconds |
 | `updated_at` | INTEGER | No | None | Unix seconds |
@@ -144,13 +144,13 @@ The application reads this table with `SELECT ... FROM user LIMIT 1`. Most pages
 | `preset_amounts` | TEXT | Yes | NULL | JSON array of XMR amounts, for example `[0.01,0.05,0.1]` |
 | `button_text` | TEXT | Yes | `Donate` | Submit button label |
 | `custom_message` | TEXT | Yes | `Your support is appreciated!` | Text above the form |
-| `thank_you_message` | TEXT | Yes | `Thank you for your donation!` | Rendered on the widget page after confirmation |
+| `thank_you_message` | TEXT | Yes | `Thank you for your donation!` | The widget page renders it after confirmation |
 | `primary_color` | TEXT | Yes | `#ff6600` | Must match `^#[0-9a-fA-F]{6}$` at the handler |
 | `redirect_url` | TEXT | Yes | NULL | Optional redirect after confirmation |
 | `created_at` | INTEGER | No | None | Unix seconds |
 | `updated_at` | INTEGER | No | None | Unix seconds |
 
-`preset_amounts` uses XMR units as JSON numbers. It is not piconero. Payment mode requires exactly one value greater than zero. Donation mode accepts zero or more positive values.
+`preset_amounts` uses XMR units as JSON numbers, not piconero. Payment mode requires exactly one value greater than zero. Donation mode accepts zero or more positive values.
 
 ### 3.3 `transaction`
 
@@ -162,23 +162,23 @@ The application reads this table with `SELECT ... FROM user LIMIT 1`. Most pages
 | `subaddress` | TEXT | No | None | Monero subaddress, unique |
 | `subaddress_index` | INTEGER | No | None | Address index from the wallet |
 | `amount` | INTEGER | Yes | NULL | Requested amount in piconero. `0` means any amount |
-| `received_amount` | INTEGER | No | `0` | Total received in piconero. `0` before a transfer is seen |
+| `received_amount` | INTEGER | No | `0` | Total received in piconero. `0` before the monitor sees a transfer |
 | `fiat_amount` | REAL | Yes | NULL | Fiat value at creation. `0` for an open-amount donation |
 | `fiat_currency` | TEXT | Yes | NULL | Currency code, for example `USD` |
 | `status` | TEXT | No | `pending` | `pending`, `mempool`, `confirming`, `underpaid`, `confirmed`, or `expired` |
 | `confirmations` | INTEGER | Yes | `0` | Last observed confirmation count |
-| `is_payment` | INTEGER | No | `0` | Boolean. Copied from the widget mode at creation |
+| `is_payment` | INTEGER | No | `0` | Boolean. The application copies it from the widget mode at creation |
 | `donor_name` | TEXT | Yes | NULL | Optional visitor name. Donation mode only |
 | `note` | TEXT | Yes | NULL | Optional visitor note or payment reference |
-| `tx_hash` | TEXT | Yes | NULL | Monero transaction hash, set by the monitor |
+| `tx_hash` | TEXT | Yes | NULL | Monero transaction hash. The monitor sets it |
 | `created_at` | INTEGER | No | None | Unix seconds |
 | `updated_at` | INTEGER | No | None | Unix seconds |
-| `confirmed_at` | INTEGER | Yes | NULL | Unix seconds. The app writes `0` before confirmation |
+| `confirmed_at` | INTEGER | Yes | NULL | Unix seconds. The application writes `0` before confirmation |
 | `expires_at` | INTEGER | No | None | Unix seconds. Creation time plus `TRANSACTION_EXPIRY` |
 
-`amount` is a signed 64 bit integer. One XMR is `1e12` piconero. The largest representable value is about 9.22 million XMR, which is above the Monero supply.
+`amount` is a signed 64 bit integer. One XMR is `1e12` piconero. The largest value that the column can hold is about 9.22 million XMR. That limit is above the Monero supply.
 
-`received_amount` is the sum of all transfers to the subaddress. The monitor writes it on each poll. For a confirmed row created by an older version, the value is `0`. The statistics and the badge use `COALESCE(NULLIF(received_amount, 0), amount)` for confirmed rows, so old rows keep their requested amount in the totals.
+`received_amount` is the sum of all transfers to the subaddress. The monitor writes it on each poll. A confirmed row from an older version has the value `0`. For confirmed rows, the statistics and the badge use `COALESCE(NULLIF(received_amount, 0), amount)`. Thus old rows keep their requested amount in the totals.
 
 `is_payment` records the mode at creation time. A later change to the widget mode does not change existing rows.
 
@@ -209,7 +209,7 @@ The application limits this table to one row per user in code. `WalletExists` co
 | `prefix` | TEXT | No | None | The 8 hex characters after `tip_` |
 | `created_at` | INTEGER | No | None | Unix seconds |
 | `expires_at` | INTEGER | No | None | Unix seconds. At most 365 days after creation |
-| `last_used_at` | INTEGER | Yes | NULL | Unix seconds, updated in a goroutine after a valid request |
+| `last_used_at` | INTEGER | Yes | NULL | Unix seconds. A goroutine updates it after a valid request |
 
 The raw key has the form `tip_` followed by 32 lowercase hex characters. The admin UI shows the full key once. The database stores only the bcrypt hash and the prefix. Several keys can share a prefix, so the authenticator compares the presented key against every row with that prefix.
 
@@ -226,9 +226,9 @@ The raw key has the form `tip_` followed by 32 lowercase hex characters. The adm
 
 Integrity notes:
 
-- The app executes `PRAGMA foreign_keys=ON` once on the connection pool. SQLite applies this pragma per connection. A later pooled connection can use the default `OFF`. Do not rely on foreign keys for critical integrity.
+- The application executes `PRAGMA foreign_keys=ON` once on the connection pool. SQLite applies this pragma to each connection. A later connection from the pool can use the default `OFF`. Do not rely on foreign keys for critical integrity.
 - `transaction.user_id` is the owner of the widget at creation time. The code does not check that it equals `widget.user_id`.
-- A user row with widgets, transactions, wallets, or API keys cannot be deleted while foreign keys are on.
+- While foreign keys are on, SQLite does not delete a user row that has widgets, transactions, wallets, or API keys.
 - `transaction.subaddress` has a unique constraint. The monitor uses this value as the match key.
 - `api_key.prefix` is not unique. The prefix is an index key, not an identifier.
 - There is no table for price history. Each transaction keeps one fiat snapshot.
@@ -251,7 +251,7 @@ The transaction list sorts by `created_at DESC`. No index covers `(user_id, crea
 
 | Value | Convention |
 |---|---|
-| Identifier | UUID v4 in lowercase text, generated by the SQLite `randomblob()` default expression |
+| Identifier | UUID v4 in lowercase text. The SQLite `randomblob()` default expression generates it |
 | Time | Unix seconds in UTC, stored as INTEGER |
 | Amount | Piconero as INTEGER. 1 XMR = `1e12` piconero |
 | Received amount | Piconero as INTEGER. Sum of all transfers to the subaddress |
@@ -281,33 +281,33 @@ Unit conversion:
 | Confirmation reached | `status` becomes `confirmed`, `confirmed_at` gets the current time |
 | Expiry reached | `status` becomes `expired` for rows in `pending` or `underpaid` |
 | Widget deleted | `transaction.widget_id` becomes NULL, transaction rows remain |
-| API key expires | Row remains, the authenticator rejects the key |
-| Admin deletes an API key | Row removed |
-| Admin updates wallet config | Wallet row updated |
+| API key expires | Row remains. The authenticator rejects the key |
+| Admin deletes an API key | The application removes the row |
+| Admin updates wallet config | The application updates the wallet row |
 | Process restart | No change. The monitor resumes from the `pending`, `mempool`, and `confirming` rows |
 
 The application has no delete path for transactions, users, or wallets. It also has no retention or pruning job. The database grows with each transaction.
 
 ## 8. Schema management
 
-The schema is a single string in `internal/database/sqlite.go`. The app runs it on every start with `CREATE TABLE IF NOT EXISTS` and `CREATE INDEX IF NOT EXISTS`.
+The schema is a single string in `internal/database/sqlite.go`. The application runs it on every start with `CREATE TABLE IF NOT EXISTS` and `CREATE INDEX IF NOT EXISTS`.
 
 There is no migration table and no version field. Consequences for maintainers:
 
 - A new column needs a manual `ALTER TABLE`, or a fresh database.
 - A changed column type or constraint needs a table rebuild.
-- An existing database keeps its old schema when the code adds a new table only. New tables appear, existing tables do not change.
-- A backup before a schema change is mandatory.
+- An existing database keeps its old schema when the code only adds a new table. New tables appear. Existing tables do not change.
+- Make a backup before a schema change.
 
 ### 8.1 Manual change for `received_amount`
 
-This version adds `received_amount` to the `transaction` table. A fresh database gets the column from the schema. For an existing database, stop the app, back up the database, and run this command before the new binary starts:
+This version adds `received_amount` to the `transaction` table. A fresh database gets the column from the schema. For an existing database, stop the application and back up the database. Then run this command before the new binary starts:
 
 ```bash
 sqlite3 tiponero.db 'ALTER TABLE "transaction" ADD COLUMN received_amount INTEGER NOT NULL DEFAULT 0;'
 ```
 
-The app checks for the column at startup. If the column is missing, it stops with an error that contains this command. There is no automatic migration.
+The application checks for the column at startup. If the column is missing, it stops with an error that contains this command. There is no automatic migration.
 
 ## 9. Backup and restore
 
@@ -328,7 +328,7 @@ Restore:
 3. Remove stale `tiponero.db-wal` and `tiponero.db-shm` files.
 4. Start the process.
 
-The `ENCRYPTION_KEY` must match the key that encrypted the wallet passwords in the backup. Without it, the app cannot read the wallet config.
+The `ENCRYPTION_KEY` must match the key that encrypted the wallet passwords in the backup. Without it, the application cannot read the wallet config.
 
 ## 10. Example rows
 

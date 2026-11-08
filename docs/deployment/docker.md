@@ -5,7 +5,7 @@ title: Docker
 
 # Docker Deployment
 
-Tiponero provides a multi-stage Dockerfile that produces a minimal container image based on Google's distroless base.
+Tiponero supplies a multi-stage Dockerfile. The Dockerfile makes a small container image, and the image uses the distroless base from Google.
 
 ## Quick Start
 
@@ -26,7 +26,7 @@ docker run -d \
 
 ## Docker Compose
 
-For a complete setup with `monerod` and `monero-wallet-rpc`, use Docker Compose:
+For a full setup with `monerod` and `monero-wallet-rpc`, use Docker Compose:
 
 ```yaml title="docker-compose.yml"
 services:
@@ -90,12 +90,12 @@ volumes:
 ```
 
 :::warning
-Replace `ENCRYPTION_KEY` and RPC credentials with your own values before deploying. Generate a key with `openssl rand -hex 16`.
+Replace `ENCRYPTION_KEY` and the RPC credentials with your own values before you deploy. Generate a key with `openssl rand -hex 16`.
 :::
 
 ### Initial Wallet Setup
 
-Before starting the stack for the first time, you need to create a wallet file in the `wallet-data` volume:
+Before you start the stack for the first time, create a wallet file in the `wallet-data` volume:
 
 ```bash
 # Start only monerod first and wait for sync
@@ -113,7 +113,7 @@ docker compose run --rm wallet-rpc \
 docker compose up -d
 ```
 
-After the stack is running, configure the wallet connection in the Tiponero admin panel:
+After the stack starts, configure the wallet connection in the Tiponero admin panel:
 
 | Field | Value |
 |---|---|
@@ -125,7 +125,7 @@ After the stack is running, configure the wallet connection in the Tiponero admi
 
 ## Building the Image Locally
 
-If you prefer to build the image yourself:
+If you want to build the image yourself:
 
 ```bash
 git clone https://github.com/tiponero/tiponero-core.git
@@ -135,7 +135,7 @@ docker build -t tiponero .
 
 ### Dockerfile Details
 
-The Dockerfile uses a two-stage build:
+The Dockerfile has two build stages:
 
 **Stage 1: Builder** (`golang:1.26-bookworm`)
 - Installs `templ` CLI and Tailwind CSS standalone binary
@@ -158,7 +158,7 @@ The final image is approximately 20MB.
 
 ## Health Check
 
-Tiponero exposes a health check endpoint at `/health`:
+Tiponero has a health check endpoint at `/health`:
 
 ```yaml
 healthcheck:
@@ -169,7 +169,7 @@ healthcheck:
 ```
 
 :::info
-The distroless image does not include `wget` or `curl`. If you need container health checks, use Docker's built-in TCP health check or add a health check binary in the build stage.
+The distroless image does not contain `wget` or `curl`. If you need container health checks, use the TCP health check of Docker. You can also add a health check binary in the build stage.
 :::
 
 ## Environment Variables
@@ -183,4 +183,4 @@ docker compose pull tiponero
 docker compose up -d tiponero
 ```
 
-The SQLite schema is idempotent (`CREATE TABLE IF NOT EXISTS`), so database migrations happen automatically on startup.
+The SQLite schema is idempotent (`CREATE TABLE IF NOT EXISTS`), so database migrations occur automatically at startup.

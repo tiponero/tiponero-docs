@@ -5,18 +5,18 @@ title: templ Toolchain
 
 # templ Toolchain
 
-Tiponero compiles `.templ` files to Go code, then compiles the Go code. Two parts of templ take part in a build:
+Tiponero compiles `.templ` files to Go code, then compiles the Go code. Each build uses two parts of templ:
 
 | Part | Version source |
 |---|---|
 | Command line tool (`templ generate`) | `tools/go.mod` |
 | Go module `github.com/a-h/templ` | `go.mod`, plus the copy in `vendor/` |
 
-The command line tool writes calls into the generated `*_templ.go` files. The Go module must contain each function that the tool writes. If the two versions disagree, the build stops at compile time.
+The command line tool writes function calls into the generated `*_templ.go` files. The Go module must contain each function that the tool writes. If the two versions do not agree, the build stops at compile time.
 
 ## One version, two modules
 
-Use the same version in the main module and in the tools module. The tools module declares the tool with the Go `tool` directive, so `go -C tools tool templ generate` always runs the version from `tools/go.mod`. You do not need a global `templ` binary.
+Use the same version in the main module and in the tools module. The tools module declares the tool with the Go `tool` directive. Thus `go -C tools tool templ generate` always runs the version from `tools/go.mod`. You do not need a global `templ` binary.
 
 Examine the two versions:
 
@@ -63,7 +63,7 @@ The output must show the same version.
 
 Commit `go.mod`, `go.sum`, `tools/go.mod`, `tools/go.sum`, `vendor/`, and the regenerated `*_templ.go` files in one commit. Do not edit the generated files by hand.
 
-`GOFLAGS=-mod=mod` is necessary while `vendor/` exists. Go otherwise uses vendor mode and refuses to change the module graph.
+`GOFLAGS=-mod=mod` is necessary while `vendor/` exists. Without the flag, Go uses vendor mode and refuses to change the module graph.
 
 ## Troubleshooting
 
@@ -86,7 +86,7 @@ grep -rn "func ResolveAttributeValue" vendor/github.com/a-h/templ/
 
 ### The generated files change on every build
 
-The Go module and the command line tool are out of step in the other direction. Run the bump procedure to align them. A Nix build regenerates the templates with the templ binary from nixpkgs, so a stale module shows up as a diff after the build. See [Nix Packaging](/docs/development/nix-packaging).
+The Go module and the command line tool are out of step in the other direction. Run the bump procedure to align them. A Nix build regenerates the templates with the templ binary from nixpkgs. Thus a stale module shows as a diff after the build. See [Nix Packaging](/docs/development/nix-packaging).
 
 ### A global `templ` binary
 

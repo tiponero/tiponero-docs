@@ -5,7 +5,7 @@ title: Monero Wallet RPC Setup
 
 # Monero Wallet RPC Setup
 
-Tiponero connects to `monero-wallet-rpc`, which in turn connects to a Monero daemon (`monerod`). The daemon can be either a **remote node** you trust or a **local node** you run yourself.
+Tiponero connects to `monero-wallet-rpc`, and `monero-wallet-rpc` connects to a Monero daemon (`monerod`). The daemon can be a **remote node** that you trust, or a **local node** that you run yourself.
 
 ```mermaid
 flowchart LR
@@ -15,7 +15,7 @@ flowchart LR
 
 ## Install Monero CLI
 
-Download from the [official website](https://www.getmonero.org/downloads/#cli) or install via your package manager:
+Download the CLI from the [official website](https://www.getmonero.org/downloads/#cli), or install it with your package manager:
 
 ```bash
 # Debian/Ubuntu
@@ -31,11 +31,11 @@ nix-shell -p monero-cli
 brew install monero
 ```
 
-This provides both `monerod` and `monero-wallet-rpc`.
+The package supplies both `monerod` and `monero-wallet-rpc`.
 
 ## Create a View-Only Wallet
 
-If you already have a Monero wallet, create a view-only version:
+If you already have a Monero wallet, create a view-only copy of it:
 
 ```bash
 monero-wallet-cli --generate-from-keys wallet_view_only \
@@ -44,7 +44,7 @@ monero-wallet-cli --generate-from-keys wallet_view_only \
   --spendkey 0000000000000000000000000000000000000000000000000000000000000000
 ```
 
-If you're starting from scratch:
+If you start with a new wallet:
 
 ```bash
 # Create a new wallet (save the seed phrase securely!)
@@ -59,16 +59,16 @@ monero-wallet-cli --wallet-file wallet
 ```
 
 :::warning
-Never use a full wallet (with spend key) on the Tiponero server. Always use a view-only wallet. The server can monitor incoming payments but cannot spend your funds.
+Never use a full wallet (with spend key) on the Tiponero server. Always use a view-only wallet. The server can monitor incoming payments, but it cannot spend your funds.
 :::
 
 ## Connect to a Monero Daemon
 
 ### Option A: Remote Node (Recommended)
 
-A remote node lets you skip running `monerod` entirely. No multi-day blockchain sync, no disk space requirements.
+With a remote node, you do not run `monerod`. You skip the multi-day blockchain sync and the disk space requirements.
 
-**Trade-offs:** the remote node operator can see that *someone* is querying certain block heights, but Monero's protocol still protects sender, receiver, and amount cryptographically. A malicious remote node could withhold blocks, delaying payment detection, but cannot steal funds from a view-only wallet. For donation use cases this is usually acceptable.
+**Trade-offs:** the operator of the remote node can see that *someone* queries certain block heights. The Monero protocol still protects the sender, the receiver, and the amount with cryptography. A malicious remote node can withhold blocks and delay payment detection, but it cannot steal funds from a view-only wallet. For donation use cases, this risk is usually acceptable.
 
 Some public remote nodes:
 
@@ -79,7 +79,7 @@ Some public remote nodes:
 | Seth for Privacy | `node.sethforprivacy.com:18089` |
 
 :::tip
-Port `18089` indicates a restricted RPC endpoint (no admin commands), which is what you want when connecting to a third-party node.
+Port `18089` indicates a restricted RPC endpoint (no admin commands). Use this port when you connect to a third-party node.
 :::
 
 Start `monero-wallet-rpc` with a remote daemon:
@@ -95,13 +95,13 @@ monero-wallet-rpc \
   --non-interactive
 ```
 
-No `--daemon-login` is needed for public remote nodes.
+Public remote nodes do not need `--daemon-login`.
 
 ### Option B: Local Node
 
-Running your own `monerod` gives you full sovereignty: no trust in third parties, no metadata leakage, no dependency on someone else's uptime.
+Your own `monerod` gives you full control. You trust no third party, and no metadata leaves your server. You do not depend on the uptime of another operator.
 
-Start a pruned node (reduces disk usage from ~200GB to ~50GB):
+Start a pruned node. A pruned node decreases the disk use from ~200GB to ~50GB:
 
 ```bash
 monerod \
@@ -114,10 +114,10 @@ monerod \
 ```
 
 :::info
-Initial sync takes several hours to days depending on hardware and network. Check progress with `monerod status`.
+The initial sync takes from several hours to days, and it depends on the hardware and the network. Show the progress with `monerod status`.
 :::
 
-Then start `monero-wallet-rpc` pointing at your local daemon:
+Then start `monero-wallet-rpc` and point it at your local daemon:
 
 ```bash
 monero-wallet-rpc \
@@ -133,7 +133,7 @@ monero-wallet-rpc \
 
 ## Verify the Connection
 
-Test that `monero-wallet-rpc` is responding:
+Make sure that `monero-wallet-rpc` answers:
 
 ```bash
 curl -s -X POST http://127.0.0.1:18083/json_rpc \

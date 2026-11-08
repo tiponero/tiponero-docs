@@ -5,7 +5,7 @@ title: User
 
 # User API
 
-Read and update the authenticated user's profile information.
+You can read and update the profile of the authenticated user.
 
 ## Get User
 
@@ -13,7 +13,7 @@ Read and update the authenticated user's profile information.
 GET /api/v1/user
 ```
 
-Returns the profile of the authenticated user.
+The response contains the profile of the authenticated user.
 
 **Example:**
 
@@ -45,18 +45,18 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 PATCH /api/v1/user
 ```
 
-Updates the authenticated user's profile. Only include the fields you want to change.
+This request updates the profile of the authenticated user. Include only the fields that you want to change.
 
 **Request body:**
 
 | Field | Type | Description |
 |---|---|---|
-| `display_name` | string | Display name shown on widgets |
-| `bio` | string | Short biography shown on widgets |
-| `avatar_url` | string | URL to an avatar image shown on widgets |
+| `display_name` | string | Display name that appears on widgets |
+| `bio` | string | Short biography that appears on widgets |
+| `avatar_url` | string | URL of an avatar image that appears on widgets |
 
 :::info
-The `username` and `password` cannot be changed through the API. Use the admin panel (**Settings > Profile** and **Settings > Password**) for those.
+You cannot change the `username` or the `password` through the API. Use the admin panel (**Settings > Profile** and **Settings > Password**) for those.
 :::
 
 **Example:**
@@ -95,10 +95,10 @@ curl -X PATCH \
 | Field | Type | Description |
 |---|---|---|
 | `id` | string | UUID of the user |
-| `username` | string | Login username |
-| `display_name` | string\|null | Display name shown publicly on widgets |
-| `bio` | string\|null | Short biography shown on widgets |
-| `avatar_url` | string\|null | URL to an avatar image |
+| `username` | string | Username for login |
+| `display_name` | string\|null | Display name that appears publicly on widgets |
+| `bio` | string\|null | Short biography that appears on widgets |
+| `avatar_url` | string\|null | URL of an avatar image |
 | `has_2fa` | boolean | Whether TOTP two-factor authentication is enabled |
 | `created_at` | integer | Unix timestamp of account creation |
 | `updated_at` | integer | Unix timestamp of last profile update |

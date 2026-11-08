@@ -5,16 +5,16 @@ title: How It Works
 
 # How It Works
 
-Tiponero is a single Go binary that bundles an HTTP server, an embedded SQLite database, an HTMX-based admin panel, and a background payment monitor. It connects to your `monero-wallet-rpc` instance over JSON-RPC to generate subaddresses and track incoming transfers.
+Tiponero is one Go binary. The binary contains an HTTP server, an embedded SQLite database, an HTMX admin panel, and a background payment monitor. Tiponero connects to your `monero-wallet-rpc` instance over JSON-RPC. It makes subaddresses and tracks incoming transfers through that connection.
 
 ## Key Design Decisions
 
-- **Single binary:** the compiler embeds all static assets (CSS, JS, images) via `go:embed`. No external file dependencies at runtime.
-- **SQLite with WAL:** no separate database server needed. WAL mode gives concurrent read access during writes.
-- **View-only wallet:** the `monero-wallet-rpc` instance runs with a view-only wallet. Tiponero can see incoming payments but cannot spend funds.
-- **Per-transaction subaddresses:** each payment/donation gets a unique Monero subaddress via `create_address` RPC. Addresses are never reused.
-- **Hot-swappable RPC client:** changing wallet configuration in the admin panel immediately updates the live RPC connection without restarting the server.
-- **AES-256-GCM at rest:** Tiponero encrypts wallet RPC passwords before storage. Keys come from `ENCRYPTION_KEY` via HKDF, with separate derivation contexts for sessions and wallet data.
+- **One binary:** the compiler embeds all static assets (CSS, JS, images) with `go:embed`. The runtime needs no external files.
+- **SQLite with WAL:** you do not need a separate database server. WAL mode gives concurrent read access during writes.
+- **View-only wallet:** the `monero-wallet-rpc` instance runs with a view-only wallet. Tiponero can see incoming payments, but it cannot spend funds.
+- **One subaddress per transaction:** each payment or donation gets a unique Monero subaddress through the `create_address` RPC. The system never reuses an address.
+- **Hot-swappable RPC client:** a change to the wallet configuration in the admin panel updates the live RPC connection immediately. You do not restart the server.
+- **AES-256-GCM at rest:** Tiponero encrypts the wallet RPC passwords before storage. The keys come from `ENCRYPTION_KEY` through HKDF, with separate derivation contexts for the sessions and the wallet data.
 
 ## Read Next
 

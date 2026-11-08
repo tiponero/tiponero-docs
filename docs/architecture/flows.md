@@ -5,7 +5,7 @@ sidebar_position: 6
 
 # Flows and Business Logic
 
-This document explains what Tiponero Core does, in the order that a user or a maintainer meets each flow. Each section gives the trigger, the code path, the rules, and the result.
+This document explains what Tiponero Core does. The sections follow the order in which a user or a maintainer meets each flow. Each section gives the trigger, the code path, the rules, and the result.
 
 **Audience:** maintainers, operators, integrators.
 
@@ -76,7 +76,7 @@ Rules:
 - The default admin exists only when the `user` table has no rows.
 - A missing wallet row gives an empty wallet config. The process starts and the wallet is "not configured".
 - `open_wallet` runs only when `wallet_file` is not empty. A failure does not stop the process.
-- The first monitor poll happens 30 seconds after start, not at start.
+- The monitor does not poll at start. Its first poll comes 30 seconds after start.
 - The HTTP server starts after the monitor goroutine. Both use the same database handle.
 
 ## 3. Admin login
@@ -107,11 +107,11 @@ Rules:
 - When `totp_secret` is not empty, the password step does not create a session. It stores a pending user ID in the session and shows the code form.
 - The TOTP form loads the single user and compares the ID with the pending ID. A mismatch clears the pending state.
 - A valid code creates the session and clears the pending state.
-- The code names the session cookie `tiponero-session`. It is `HttpOnly`, `SameSite=Lax`, and `Secure` when `BASE_URL` starts with `https`.
-- Session lifetime is 7 days.
+- The app names the session cookie `tiponero-session`. The cookie is `HttpOnly` and `SameSite=Lax`. It is `Secure` when `BASE_URL` starts with `https`.
+- The session lifetime is 7 days.
 - `POST /admin/logout` destroys the session.
 - Every other `/admin` route redirects to `/admin/login` when the session is missing.
-- There is no rate limit and no account lockout on the login form.
+- The login form has no rate limit and no account lockout.
 
 TOTP setup:
 
@@ -152,14 +152,14 @@ sequenceDiagram
 
 Rules:
 
-- The app stores the RPC URL and RPC user in plain text. It encrypts the RPC password and the wallet password with AES-256-GCM.
+- The app stores the RPC URL and the RPC user in plain text. It encrypts the RPC password and the wallet password with AES-256-GCM.
 - The app derives the encryption key from `ENCRYPTION_KEY` with HKDF-SHA256 and the context string `wallet`.
 - `SaveWalletConfig` inserts a row when the user has no wallet row. It updates the existing row otherwise.
 - The handler creates a new client and replaces the old client in the holder under a mutex. In-flight requests finish with the old client.
 - The handler does not call `get_height` before it saves. The status card shows the result on the next page load.
 - The status card reports three states: not configured, configured but not connected, and connected with a block height.
-- `open_wallet` failure does not block the save.
-- The REST API can create a wallet and update the URL, user, and wallet file. It cannot change the passwords. Use the admin settings page for passwords.
+- An `open_wallet` failure does not block the save.
+- The REST API can create a wallet and update the URL, the user, and the wallet file. It cannot change the passwords. Use the admin settings page for passwords.
 - `POST /api/v1/wallet` returns HTTP 409 when a wallet already exists.
 
 ## 5. Widget creation and publication
@@ -198,9 +198,9 @@ Rules:
 | `primary_color` | `#RRGGBB`, default `#ff6600` | Same |
 | `button_text` | Default `Donate`, or `Pay` in payment mode | Same |
 | `custom_message` | Default `Your support is appreciated!` | Same |
-| `thank_you_message` | Optional text field; default depends on mode | Accepted from the request; default depends on mode |
+| `thank_you_message` | Optional text field, the default depends on the mode | Accepted from the request, the default depends on the mode |
 | `show_stats` | Checkbox, on when present | Boolean, default `true` |
-| `redirect_url` | Trimmed text, browser checks the URL format | Stored as given |
+| `redirect_url` | Trimmed text, the browser checks the URL format | Stored as given |
 
 After creation, the widget list shows four publication options:
 
@@ -217,7 +217,7 @@ The admin UI can create and delete widgets. It has no edit form. Use `PATCH /api
 
 ## 6. Donation and payment flow
 
-This is the main flow. It starts when a visitor opens a widget and ends when the monitor confirms the payment or the transaction expires.
+This is the main flow. It starts when a visitor opens a widget. It ends when the monitor confirms the payment or the transaction expires.
 
 ```mermaid
 sequenceDiagram
@@ -280,7 +280,7 @@ sequenceDiagram
 | Payment | Fixed amount, note | Hidden field with the first preset amount |
 
 - The handler loads the widget by ID. A missing widget returns HTTP 404.
-- The handler loads the single user row for the display name, bio, and avatar.
+- The handler loads the single user row for the display name, the bio, and the avatar.
 - The page applies the widget theme and the primary color.
 - A donation with an empty amount field creates an open-amount transaction. The payment page then shows "Any amount".
 
@@ -318,12 +318,12 @@ The app stores the requested amount in `amount`. It stores the received amount i
 - The QR content is `monero:<subaddress>`. When the amount is greater than zero, it adds `?tx_amount=<XMR>` with 12 decimal places.
 - The QR response has `Cache-Control: public, max-age=3600`.
 - The status component polls every 3 seconds while the status is not `confirmed` and not `expired`.
-- When `redirect_url` is set, the page warns the visitor not to close the window and installs a `beforeunload` handler. The browser removes the handler when it receives an `HX-Redirect` header.
+- When `redirect_url` is set, the page warns the visitor not to close the window. It also installs a `beforeunload` handler. The browser removes the handler when it receives an `HX-Redirect` header.
 
 ### 6.4 Status polling
 
 1. The handler reads the transaction by ID.
-2. It checks that `widget_id` matches the widget in the path. A mismatch returns HTTP 404.
+2. It makes sure that `widget_id` matches the widget in the path. A mismatch returns HTTP 404.
 3. When the status is `confirmed` and the widget has a redirect URL, the handler sets `HX-Redirect`.
 4. It renders the status fragment.
 
@@ -357,12 +357,12 @@ For an open-amount donation (`amount = 0`), any positive received amount covers 
 
 The monitor writes `status`, `confirmations`, `received_amount`, `tx_hash`, and `updated_at`. On confirmation it also writes `confirmed_at`.
 
-The monitor requires the received amount to cover the requested amount. It does not tolerate an underpayment. An overpayment is accepted and stored.
+The monitor requires the received amount to cover the requested amount. It does not tolerate an underpayment. The app accepts and stores an overpayment.
 
 ### 6.6 Confirmation and redirect
 
 - The transaction becomes `confirmed` when the received amount covers `amount` and the confirmation count reaches `CONFIRMATIONS`. The default is 10.
-- An underpayment sets `underpaid`. The page shows the required and received amounts, and the visitor can send the remaining amount to the same address.
+- An underpayment sets `underpaid`. The page shows the required and received amounts. The visitor can send the remaining amount to the same address.
 - The payment page shows "Thank you!" for a donation and "Payment confirmed!" for a payment.
 - A redirect happens only during a status poll. The visitor must keep the page open.
 - When the visitor closes the page, the monitor still confirms the transaction. No redirect happens.
@@ -371,7 +371,7 @@ The monitor requires the received amount to cover the requested amount. It does 
 ### 6.7 Expiry
 
 - Expiry applies to rows in `pending` and `underpaid`.
-- The sweep runs every 30 seconds, so a row can expire up to 30 seconds after `expires_at`.
+- The sweep runs every 30 seconds. A row can expire up to 30 seconds after `expires_at`.
 - An expired row is no longer in the active set. A payment to its subaddress after expiry is not detected and not recorded.
 - Rows in `mempool` or `confirming` have no expiry. A transfer that stays in the mempool keeps the transaction and the page active. The page shows the normal waiting state. There is no "stuck" label.
 - The status page shows the expired message and stops polling.
@@ -555,12 +555,12 @@ The CSV columns are: ID, Type, Amount (XMR), Received (XMR), Fiat Amount, Fiat C
 
 1. The app stores the requested amount in `amount` and the total received amount in `received_amount`. For an open-amount donation, `amount` is `0` and `received_amount` is the actual transfer total.
 2. Statistics and the badge use the received amount for confirmed rows. Rows confirmed by an older version have `received_amount = 0`, so the queries fall back to the requested amount.
-3. Payment mode enforces the widget preset on the server. The form amount is ignored. A crafted request cannot create a transaction with a different amount.
+3. Payment mode enforces the widget preset on the server. The app ignores the form amount. A crafted request cannot create a transaction with a different amount.
 4. The monitor sums all transfers to the subaddress and requires the total to cover the requested amount. An underpayment sets `underpaid` and is never confirmed.
 5. Expired transactions leave the active set. A late payment to an expired subaddress is not detected. This is intentional.
 6. `pending` and `underpaid` rows expire. A transfer that stays in the mempool keeps the row and the page active without a timeout. The page shows the normal waiting state. There is no "stuck" label.
 7. The widget confirmation bar uses `CONFIRMATIONS`.
-8. The widget page renders `thank_you_message` after confirmation. The admin form defaults it by mode; the API accepts it.
+8. The widget page renders `thank_you_message` after confirmation. The admin form sets a default by mode. The API accepts the value from the request.
 9. The admin UI cannot edit a widget. Use the REST API for updates.
 10. The application serves one user. `GetUser()` reads the first row only.
 11. Admin forms have no CSRF token. The session cookie uses `SameSite=Lax`.

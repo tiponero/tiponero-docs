@@ -5,13 +5,13 @@ sidebar_position: 1
 
 # Architecture Overview
 
-These pages explain how Tiponero Core works: the parts of a deployed system, the database, and the request flows. The pages use diagrams for the structure and tables for the exact rules.
+These pages explain how Tiponero Core works: the parts of a deployed system, the database, and the request flows. Diagrams show the structure. Tables give the exact rules.
 
 ## Where to Start
 
 | Page | Contents | Best for |
 |---|---|---|
-| [Technology Stack](/docs/architecture/tech-stack) | Libraries, tools, and build-time dependencies | Everyone |
+| [Technology Stack](/docs/architecture/tech-stack) | Libraries, tools, and build dependencies | Everyone |
 | [Project Structure](/docs/architecture/project-structure) | File tree and key entry points | New maintainers |
 | [System Architecture](/docs/architecture/system-architecture) | Processes, protocols, deployment, secrets, failure modes | Operators and new maintainers |
 | [Data Model](/docs/architecture/data-model) | SQLite tables, columns, relations, indexes, storage rules | Maintainers and integrators |
@@ -35,18 +35,18 @@ These pages explain how Tiponero Core works: the parts of a deployed system, the
 | Wallet RPC | The `monero-wallet-rpc` process that holds the wallet keys |
 | Monitor | Background goroutine that polls the wallet every 30 seconds |
 | Confirmation | A block added after the block that contains the transaction |
-| Underpaid | Status for a transaction whose received amount is below the requested amount |
+| Underpaid | Status of a transaction when the received amount is below the requested amount |
 | Badge | SVG image with a QR code and live statistics |
 
-Amounts appear in XMR in the UI and in piconero in the database. Widget preset amounts are stored in XMR. Each page states the unit when it gives a value.
+The UI shows amounts in XMR. The database stores them in piconero. The database stores widget preset amounts in XMR. Each page gives the unit with the value.
 
 Transaction status values are always lowercase: `pending`, `mempool`, `confirming`, `underpaid`, `confirmed`, `expired`.
 
 ## Source of Truth
 
-The Go source is the source of truth. When a page and the code disagree, read the code and update the page.
+The Go source is the source of truth. If a page and the code disagree, read the code and then update the page.
 
-Some of these pages started in `docs/` of the [tiponero-core](https://github.com/tiponero/tiponero-core) repository. The pages here are the maintained copies.
+Some of these pages started in the `docs/` directory of the [tiponero-core](https://github.com/tiponero/tiponero-core) repository. The pages here are the maintained copies.
 
 ## Related Pages
 

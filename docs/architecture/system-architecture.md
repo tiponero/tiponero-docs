@@ -5,11 +5,11 @@ sidebar_position: 4
 
 # System Architecture
 
-Tiponero Core is a self-hosted Monero payment engine. This document shows the parts of a deployed system, the protocols between them, and the data each part holds.
+Tiponero Core is a self-hosted Monero payment engine. This document shows the parts of a deployed system and the protocols between those parts. It also shows the data that each part holds.
 
 **Audience:** maintainers and operators.
 
-**Scope:** the deployed system and its runtime dependencies. Business flows are in [Flows and Business Logic](/docs/architecture/flows). The database schema is in [Data Model](/docs/architecture/data-model).
+**Scope:** the deployed system and its runtime dependencies. The business flows are in [Flows and Business Logic](/docs/architecture/flows). The database schema is in [Data Model](/docs/architecture/data-model).
 
 ## 1. At a glance
 
@@ -30,7 +30,7 @@ The process has three jobs:
 2. Record each transaction and its subaddress in SQLite.
 3. Poll the wallet for incoming transfers and update transaction status.
 
-The process is stateless between restarts. All durable state is in the SQLite file. The only in-memory state is the fiat price cache and the live wallet RPC client.
+The process keeps no state between restarts. All durable state is in the SQLite file. The only in-memory state is the fiat price cache and the live wallet RPC client.
 
 ## 2. System context
 
@@ -63,7 +63,7 @@ flowchart TB
 
 ### 2.1 Context elements
 
-Colors show the role. Gray marks actors. Purple marks the edge proxy, orange marks the application, blue marks the data store, and green marks external systems.
+Colors show the role. Gray marks the actors. Purple marks the edge proxy, orange marks the application, blue marks the data store, and green marks external systems.
 
 | Element | Trust zone | Responsibility |
 |---|---|---|
@@ -138,10 +138,10 @@ flowchart TB
 | Crypto | `internal/crypto` | HKDF-SHA256 key derivation, AES-256-GCM encryption |
 | Repositories | `internal/database` | Schema creation and SQL queries |
 | Monero client | `internal/monero` | JSON-RPC calls, digest auth, connection status |
-| Payment monitor | `internal/services/monitor.go` | Expiry sweep, transfer polling, amount verification |
+| Payment monitor | `internal/services/monitor.go` | Expiry sweep, transfer polling, amount checks |
 | Price service | `internal/services/price.go` | CoinGecko fetch with a 5 minute cache |
 | QR and badge | `internal/services/qrcode.go`, `badge.go` | PNG QR codes and SVG badges |
-| TOTP | `internal/services/totp.go` | Secret generation and code validation |
+| TOTP | `internal/services/totp.go` | Secret generation and code checks |
 | Config | `internal/config` | Environment values and defaults |
 
 The HTTP handlers and the payment monitor share the same repository and wallet client. The monitor runs in a separate goroutine. It does not serve requests.
@@ -154,10 +154,10 @@ The client calls `<rpc_url>/json_rpc` with JSON-RPC 2.0. If `rpc_user` is set, t
 
 | Method | Caller | Purpose | Failure behavior |
 |---|---|---|---|
-| `create_address` | Widget handler | Create one subaddress per transaction | Visitor sees an error page, the handler stores no transaction |
-| `get_transfers` | Payment monitor | Read incoming, pending, and pool transfers | The monitor logs the error and keeps the status, retry after 30 s |
-| `get_height` | Wallet status card | Show the wallet chain height | Status shows disconnected |
-| `open_wallet` | Startup and settings save | Open the configured wallet file | Warning only, the process continues |
+| `create_address` | Widget handler | Create one subaddress per transaction | The visitor sees an error page. The handler stores no transaction |
+| `get_transfers` | Payment monitor | Read incoming, pending, and pool transfers | The monitor logs the error and keeps the status. It retries after 30 s |
+| `get_height` | Wallet status card | Show the wallet chain height | The status shows disconnected |
+| `open_wallet` | Startup and settings save | Open the configured wallet file | Warning only. The process continues |
 
 `create_address` uses account index `0`. The label is `tx-` plus 16 random bytes in hex.
 
@@ -178,7 +178,7 @@ The widget group is public by design. A widget URL is the payment entry point. T
 | Dependency | Protocol | Timeout | Caching |
 |---|---|---|---|
 | `monero-wallet-rpc` | HTTP or HTTPS JSON-RPC | 30 s | None |
-| CoinGecko | HTTPS | 10 s | 5 min in memory, stale value on error |
+| CoinGecko | HTTPS | 10 s | 5 min in memory. The service uses the stale value on error |
 | Google Fonts | HTTPS, from the browser | Browser default | Browser cache |
 
 The pages load Space Grotesk, Inter, JetBrains Mono, and Material Symbols from Google Fonts. This is a browser-side dependency. It does not affect payment processing.
@@ -275,12 +275,12 @@ Security properties of the current design:
 
 ### 7.1 Startup
 
-1. Read `.env` if the file exists.
-2. Load environment values and apply defaults.
+1. Read the `.env` file if it exists.
+2. Load the environment values and apply the defaults.
 3. Warn when `ENCRYPTION_KEY` is short or equal to the example value.
 4. Derive the session key and the wallet key with HKDF-SHA256.
-5. Open SQLite, enable WAL and foreign keys, and create missing tables and indexes.
-6. Create the default admin user `admin` with password `admin` when the `user` table is empty.
+5. Open SQLite, enable WAL and foreign keys, and create the missing tables and indexes.
+6. Create the default admin user `admin` with the password `admin` when the `user` table is empty.
 7. Load the user and the wallet config. Decrypt the wallet passwords.
 8. Create the wallet RPC client. Call `open_wallet` when a wallet file is set.
 9. Start the payment monitor goroutine.
@@ -300,14 +300,14 @@ Security properties of the current design:
 |---|---|---|
 | Wallet RPC not configured | New transactions show "Payments are not available yet" | Set the wallet config in Settings |
 | Wallet RPC unreachable | New transactions show "Wallet is currently unavailable" | Retry when the RPC is back |
-| `get_transfers` fails | Status stays at the last value | Next poll after 30 s |
+| `get_transfers` fails | The status stays at the last value | The next poll, after 30 s |
 | Wallet RPC call exceeds 30 s | The request fails with a timeout error | Check the RPC and the network, then retry |
-| `open_wallet` fails | Process continues, wallet status shows an error | Fix the wallet file or password in Settings |
-| CoinGecko unreachable | The price service uses the stale price, or the fiat amount is `0` | Next request after the cache expires |
-| SQLite write fails | Handler returns HTTP 500 | Check disk space and file permissions |
-| `ENCRYPTION_KEY` changed | Startup stops at wallet config load | Restore the old key or re-enter the wallet config |
-| Process killed | WAL recovery on next start | In-flight polls repeat, updates are idempotent |
-| Chain reorganization | Confirmations can go down while the row is active. The status follows the new count | The row returns to a higher state after more blocks. A confirmed row is no longer polled |
+| `open_wallet` fails | The process continues. The wallet status shows an error | Correct the wallet file or the password in Settings |
+| CoinGecko unreachable | The price service uses the stale price, or the fiat amount is `0` | The next request after the cache expires |
+| SQLite write fails | The handler returns HTTP 500 | Check the disk space and the file permissions |
+| `ENCRYPTION_KEY` changed | Startup stops at the wallet config load | Restore the old key or enter the wallet config again |
+| Process killed | WAL recovery on the next start | In-flight polls repeat. The updates are idempotent |
+| Chain reorganization | Confirmations can go down while the row is active. The status follows the new count | The row returns to a higher state after more blocks. The monitor no longer polls a confirmed row |
 
 ## 9. Limits and scaling
 
@@ -316,7 +316,7 @@ Security properties of the current design:
 - The monitor makes one `get_transfers` call for all active transactions per 30 second cycle.
 - The admin transaction list shows 10 rows per page. The REST API defaults to 20 rows and caps at 100.
 - Each open payment page polls the status endpoint every 3 seconds.
-- Transactions are never deleted. There is no retention job.
+- The app never deletes transactions. There is no retention job.
 - There is no rate limit on the login form, the widget endpoints, or the API.
 
 ## 10. Operations checklist
@@ -339,10 +339,10 @@ The code reads these values from the environment. The table lists the code defau
 | Variable | Code default | Notes |
 |---|---|---|
 | `PORT` | `8080` | Listen port |
-| `BASE_URL` | `http://localhost:<PORT>` | Used for badge URLs and cookie security |
-| `DATABASE_PATH` | Empty | Empty path gives a temporary database, data is lost on restart |
+| `BASE_URL` | `http://localhost:<PORT>` | The app uses it for badge URLs and cookie security |
+| `DATABASE_PATH` | Empty | An empty path gives a temporary database. Data is lost on restart |
 | `ENCRYPTION_KEY` | Empty | No default. A short or empty key is insecure |
-| `FIAT_CURRENCY` | `USD` | Passed to CoinGecko in lowercase |
+| `FIAT_CURRENCY` | `USD` | The app passes it to CoinGecko in lowercase |
 | `CONFIRMATIONS` | `10` | Must be a positive integer |
 | `TRANSACTION_EXPIRY` | `1h` | Go duration string |
 

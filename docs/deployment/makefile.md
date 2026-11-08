@@ -5,7 +5,7 @@ title: Build from Source
 
 # Build from Source
 
-Build Tiponero from source using the provided Makefile. This produces a single static binary with all assets embedded.
+Build Tiponero from source with the Makefile in the repository. The build makes one static binary, and the binary contains all assets.
 
 ## Requirements
 
@@ -34,7 +34,7 @@ npm install -D tailwindcss
 
 ### Using Nix (Alternative)
 
-If you have Nix installed, all dependencies are provided by the dev shell:
+If you have Nix, the dev shell supplies all dependencies:
 
 ```bash
 nix develop
@@ -43,7 +43,7 @@ nix develop
 
 ## Building
 
-Clone the repository and run the build:
+Clone the repository, then run the build:
 
 ```bash
 git clone https://github.com/tiponero/tiponero-core.git
@@ -59,7 +59,7 @@ The `make build` target runs three steps:
 
 The output binary is at `bin/tiponero`.
 
-The Makefile runs each tool from the `tools` module. The versions of templ, Air, and golangci-lint come from `tools/go.mod`, not from your `PATH`. Keep the templ version in `tools/go.mod` equal to the `github.com/a-h/templ` version in `go.mod`. See [templ Toolchain](/docs/development/templ-toolchain).
+The Makefile starts each tool from the `tools` module. The versions of templ, Air, and golangci-lint come from `tools/go.mod`, not from your `PATH`. Keep the templ version in `tools/go.mod` equal to the `github.com/a-h/templ` version in `go.mod`. See [templ Toolchain](/docs/development/templ-toolchain).
 
 ## Makefile Targets
 
@@ -92,7 +92,7 @@ Start the server:
 ./bin/tiponero
 ```
 
-The server starts on the configured port. Open `http://localhost:8080` to access the admin panel.
+The server starts on the configured port. Go to `http://localhost:8080` to open the admin panel.
 
 ## Running as a systemd Service
 
@@ -118,7 +118,7 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-Set up the user and directories:
+Set up the user, the directories, and the environment file:
 
 ```bash
 # Create system user
@@ -155,15 +155,15 @@ For development with hot-reload:
 make dev
 ```
 
-This uses [Air](https://github.com/air-verse/air) to watch for file changes and automatically rebuild. The Air proxy runs on port 8081 by default, forwarding to the application on port 8080.
+This target uses [Air](https://github.com/air-verse/air) to monitor file changes and to rebuild automatically. The Air proxy listens on port 8081 by default, and it forwards to the application on port 8080.
 
 ## Cross-Compilation
 
-Since Tiponero uses CGO (for SQLite), cross-compilation requires a C cross-compiler. For most use cases, building on the target platform or using Docker is simpler:
+Tiponero uses CGO (for SQLite), so cross-compilation needs a C cross-compiler. For most use cases, a build on the target platform or a Docker build is simpler:
 
 ```bash
 # Build for linux/amd64 on linux/amd64 (no cross-compilation needed)
 CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o bin/tiponero ./cmd/tiponero
 ```
 
-For cross-platform builds, use the [Docker build method](/docs/deployment/docker) instead.
+For builds on other platforms, use the [Docker build method](/docs/deployment/docker) instead.

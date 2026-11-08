@@ -5,7 +5,7 @@ title: Stats
 
 # Stats API
 
-Retrieve aggregate statistics about transactions.
+You can get aggregate statistics about transactions.
 
 ## Get Stats
 
@@ -13,7 +13,7 @@ Retrieve aggregate statistics about transactions.
 GET /api/v1/stats
 ```
 
-Returns summary statistics for the authenticated user's transactions.
+The response contains summary statistics for the transactions of the authenticated user.
 
 **Example:**
 
@@ -44,12 +44,12 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 |---|---|---|
 | `total_transactions` | integer | Total number of confirmed transactions |
 | `total_amount` | integer | Total confirmed amount in piconero |
-| `total_amount_xmr` | string | Total confirmed amount formatted as XMR |
+| `total_amount_xmr` | string | Total confirmed amount as an XMR string |
 | `pending_count` | integer | Number of currently pending transactions |
 | `today_count` | integer | Number of transactions created today |
-| `today_amount` | integer | Total amount from today's transactions in piconero |
-| `today_amount_xmr` | string | Today's total formatted as XMR |
+| `today_amount` | integer | Total amount from transactions of today in piconero |
+| `today_amount_xmr` | string | Total for today as an XMR string |
 
 :::tip
-Amounts are always returned in both piconero (integer, machine-readable) and XMR (string, human-readable). Use the piconero value for calculations and the XMR string for display.
+The API always returns each amount in piconero (integer, machine-readable) and in XMR (string, human-readable). Use the piconero value for calculations. Use the XMR string for display.
 :::

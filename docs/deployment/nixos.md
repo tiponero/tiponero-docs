@@ -5,9 +5,9 @@ title: NixOS
 
 # NixOS Deployment
 
-Tiponero provides a Nix flake that builds the application for `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, and `aarch64-darwin`. This guide shows how to deploy Tiponero as a NixOS service using the flake, following a production-tested pattern.
+Tiponero supplies a Nix flake. The flake builds the application for `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, and `aarch64-darwin`. This guide shows how to deploy Tiponero as a NixOS service with the flake. The pattern comes from a production system.
 
-The configuration examples below are based on a real production deployment running on a NixOS Proxmox LXC container with Cloudflare Tunnel for public access.
+The configuration examples below come from a real production deployment. That system runs on a NixOS Proxmox LXC container, with Cloudflare Tunnel for public access.
 
 ## Flake Setup
 
@@ -103,17 +103,17 @@ in {
 }
 ```
 
-The `EnvironmentFile` injects sensitive variables (like `ENCRYPTION_KEY`) that are decrypted at boot by agenix. Non-secret variables are set directly in `environment`.
+The `EnvironmentFile` injects the sensitive variables (like `ENCRYPTION_KEY`) that agenix decrypts at boot. Set the other variables directly in `environment`.
 
 ### Secret File Format
 
-The encrypted `tiponero.age` file should contain:
+The encrypted `tiponero.age` file has this content:
 
 ```bash
 ENCRYPTION_KEY=your-random-32-character-key-here
 ```
 
-Encrypt it with agenix:
+Encrypt the file with agenix:
 
 ```bash
 agenix -e secrets/tiponero.age
@@ -121,7 +121,7 @@ agenix -e secrets/tiponero.age
 
 ## Monero Backend Module
 
-Create `monero.nix` for the full node and wallet RPC:
+Create `monero.nix` for the full node and the wallet RPC:
 
 ```nix title="monero.nix"
 { config, pkgs, ... }:
@@ -175,7 +175,7 @@ Create `monero.nix` for the full node and wallet RPC:
 }
 ```
 
-The `monero-rpc.age` secret file should contain:
+The `monero-rpc.age` secret file has this content:
 
 ```bash
 MONERO_RPC_USER=rpc_user
@@ -203,7 +203,7 @@ In your `configuration.nix`, import both modules:
 
 ## Secrets Setup (agenix)
 
-Define which secrets exist and who can decrypt them:
+Define the secrets and the users who can decrypt them:
 
 ```nix title="secrets/secrets.nix"
 let
@@ -214,13 +214,13 @@ in {
 }
 ```
 
-Get your server's age public key:
+Get the age public key of your server:
 
 ```bash
 ssh-keyscan your-server | ssh-to-age
 ```
 
-Create and encrypt secrets:
+Create and encrypt the secrets:
 
 ```bash
 agenix -e secrets/tiponero.age
@@ -241,7 +241,7 @@ nixos-rebuild switch --flake .#my-server --target-host root@your-server
 
 ## Firewall
 
-Open only the ports you need:
+Open only the ports that you need:
 
 ```nix
 networking.firewall.allowedTCPPorts = [
@@ -250,22 +250,22 @@ networking.firewall.allowedTCPPorts = [
 ];
 ```
 
-Tiponero runs on `127.0.0.1:3001` and does not need a firewall rule: it is accessed through a reverse proxy or Cloudflare Tunnel.
+Tiponero listens on `127.0.0.1:3001` and does not need a firewall rule. A reverse proxy or Cloudflare Tunnel gives access to it.
 
 ## Updating Tiponero
 
-Update the flake input and rebuild:
+Update the flake input, then rebuild:
 
 ```bash
 nix flake update tiponero
 sudo nixos-rebuild switch --flake .#my-server
 ```
 
-The systemd service will restart automatically with the new binary.
+The systemd service restarts automatically with the new binary.
 
 ## Proxmox LXC Notes
 
-If running NixOS in a Proxmox LXC container, your `hardware.nix` should include:
+If you run NixOS in a Proxmox LXC container, add these lines to your `hardware.nix`:
 
 ```nix title="hardware.nix"
 {
@@ -277,10 +277,10 @@ If running NixOS in a Proxmox LXC container, your `hardware.nix` should include:
 }
 ```
 
-This configuration works with standard unprivileged LXC containers: no special privileges required.
+Use this configuration with standard unprivileged LXC containers. It needs no special privileges.
 
 ## Build Errors After a nixpkgs Update
 
-The flake takes the templ CLI from nixpkgs, so a nixpkgs update can move the CLI ahead of the Go module in `go.mod`. The build then stops with `undefined: templ.ResolveAttributeValue`.
+The flake gets the templ CLI from nixpkgs. Thus a nixpkgs update can move the CLI ahead of the Go module in `go.mod`. The build then stops with `undefined: templ.ResolveAttributeValue`.
 
-The [Nix Packaging](/docs/development/nix-packaging) page gives the test command for a specific nixpkgs revision and the update procedure. The [templ Toolchain](/docs/development/templ-toolchain) page gives the version bump steps.
+The [Nix Packaging](/docs/development/nix-packaging) page gives the test command for a specific nixpkgs revision, and it gives the update procedure. The [templ Toolchain](/docs/development/templ-toolchain) page gives the version bump steps.

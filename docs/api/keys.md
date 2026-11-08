@@ -5,10 +5,10 @@ title: API Keys
 
 # API Keys
 
-List and delete API keys. Keys are created through the admin panel (**Settings > API Keys**).
+You can list and delete API keys. You create keys in the admin panel (**Settings > API Keys**).
 
 :::info
-API key creation is only available through the admin panel, not through the API itself. This is a deliberate security decision: creating API keys requires an active admin session.
+You can create API keys only in the admin panel, not through the API itself. This is a deliberate security decision: an active admin session is necessary to create a key.
 :::
 
 ## List API Keys
@@ -17,7 +17,7 @@ API key creation is only available through the admin panel, not through the API 
 GET /api/v1/keys
 ```
 
-Returns all API keys for the authenticated user. The raw key value is never returned: only the prefix and metadata.
+The response contains all API keys of the authenticated user. The API never returns the raw key value, only the prefix and the metadata.
 
 **Example:**
 
@@ -57,7 +57,7 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 DELETE /api/v1/keys/{id}
 ```
 
-Permanently deletes an API key. This action is irreversible. Any clients using this key will immediately lose access.
+This request deletes an API key permanently. You cannot undo this action. Any client that uses this key loses access immediately.
 
 **Example:**
 

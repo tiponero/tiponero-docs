@@ -5,7 +5,7 @@ title: Project Structure
 
 # Project Structure
 
-The codebase follows standard Go project layout conventions. All application code lives under `internal/`, which prevents external packages from importing it.
+The codebase follows the standard Go project layout. All application code is under `internal/`, so external packages cannot import it.
 
 ```
 tiponero-core/
@@ -88,32 +88,32 @@ tiponero-core/
 
 ### `cmd/tiponero/main.go`
 
-The `main()` function orchestrates startup in this order:
+The `main()` function starts the process in this order:
 
-1. Load `.env` file and parse configuration
-2. Derive session and wallet encryption keys via HKDF from `ENCRYPTION_KEY`
-3. Open SQLite database, run schema migrations, seed default `admin/admin` user if none exists
-4. Load wallet config from database (decrypt stored passwords), create Monero RPC client
-5. Wire up all HTTP handlers with `handlers.NewRouter()`
+1. Load the `.env` file and parse the configuration
+2. Derive the session key and the wallet encryption key with HKDF from `ENCRYPTION_KEY`
+3. Open the SQLite database, run the schema migrations, and create the default `admin/admin` user if none exists
+4. Load the wallet config from the database and decrypt the stored passwords, then create the Monero RPC client
+5. Wire all HTTP handlers with `handlers.NewRouter()`
 6. Start the `PaymentMonitor` background goroutine
-7. Start HTTP server on `PORT`
-8. Wait for `SIGINT`/`SIGTERM`, then graceful shutdown with 10-second timeout
+7. Start the HTTP server on `PORT`
+8. Wait for `SIGINT` or `SIGTERM`, then shut down with a 10-second timeout
 
 ### `internal/handlers/routes.go`
 
-All HTTP routes are defined in a single file. Routes are organized into four groups:
+One file defines all HTTP routes. The routes fall into four groups:
 
 - **Root:** `/` redirect, `/health`, `/static/*`
-- **Admin:** `/admin/*` (session-cookie auth via `RequireAuth` middleware)
-- **API:** `/api/v1/*` (Bearer token auth via `RequireAPIKey` middleware)
+- **Admin:** `/admin/*` (session-cookie auth with the `RequireAuth` middleware)
+- **API:** `/api/v1/*` (Bearer token auth with the `RequireAPIKey` middleware)
 - **Widget:** `/widget/*` (no auth, public-facing)
 
 ### `internal/services/monitor.go`
 
 The `PaymentMonitor` runs in a background goroutine with a 30-second ticker:
 
-1. Expire old transactions (mark `pending` transactions past `expires_at` as `expired`)
+1. Expire old transactions: mark `pending` transactions past `expires_at` as `expired`
 2. Call `get_transfers` on `monero-wallet-rpc` for `in`, `pending`, and `pool` transfers
 3. Index all transfers by subaddress
 4. Update transaction status: `pending` → `mempool` → `confirming` → `confirmed`
-5. Match based on confirmation count vs. `RequiredConfirmations` config value
+5. Match on the confirmation count against the `RequiredConfirmations` config value

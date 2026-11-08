@@ -5,11 +5,11 @@ title: Security
 
 # Security
 
-Tiponero handles financial data and cryptographic credentials. This guide covers the security model and best practices for production deployments.
+Tiponero handles financial data and cryptographic credentials. This guide covers the security model and the best practices for production deployments.
 
 ## Encryption Key
 
-The `ENCRYPTION_KEY` environment variable is the master secret. Two sub-keys are derived from it using HKDF-SHA256:
+The `ENCRYPTION_KEY` environment variable is the master secret. The application derives two sub-keys from it with HKDF-SHA256:
 
 | Derived Key | Context String | Purpose |
 |---|---|---|
@@ -28,7 +28,7 @@ openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 32
 
 ### Key Rotation
 
-Changing `ENCRYPTION_KEY` has the following effects:
+A change to `ENCRYPTION_KEY` has these effects:
 
 | Impact | Recovery |
 |---|---|
@@ -36,7 +36,7 @@ Changing `ENCRYPTION_KEY` has the following effects:
 | Stored wallet passwords become unreadable | Re-enter wallet config in Settings |
 | API keys continue to work | API keys use bcrypt, not the encryption key |
 
-There is no automated key rotation mechanism. If you need to rotate, update the variable, restart the service, and re-enter wallet credentials.
+There is no automated key rotation mechanism. To rotate the key, update the variable, restart the service, and enter the wallet credentials again.
 
 ## Password Storage
 
@@ -49,7 +49,7 @@ There is no automated key rotation mechanism. If you need to rotate, update the 
 | TOTP secret | Stored in plaintext in the database |
 
 :::info
-API keys use a two-step verification: an 8-character prefix is used to find candidates in the database, then bcrypt comparison confirms the match. This avoids scanning the entire table for every request.
+API keys use a two-step check. An 8-character prefix finds the candidate rows in the database, then a bcrypt comparison confirms the match. This method does not scan the full table for each request.
 :::
 
 ## Two-Factor Authentication (TOTP)
@@ -61,7 +61,7 @@ Enable TOTP 2FA in **Settings > Two-Factor Authentication**:
 - Period: 30 seconds
 - Compatible with Google Authenticator, Authy, and all standard TOTP apps
 
-When enabled, login requires both password and TOTP code. The TOTP code is verified before a session is created.
+When TOTP is active, the login needs the password and the TOTP code. The application checks the TOTP code before it makes a session.
 
 ## Session Security
 
@@ -74,7 +74,7 @@ When enabled, login requires both password and TOTP code. The TOTP code is verif
 | `Secure` | Yes, if `BASE_URL` starts with `https://` |
 
 :::warning
-Always set `BASE_URL` to an `https://` URL in production. This ensures cookies are only transmitted over encrypted connections.
+Set `BASE_URL` to an `https://` URL in production. With this setting, cookies travel only over encrypted connections.
 :::
 
 ## Network Security
@@ -88,7 +88,7 @@ Always set `BASE_URL` to an `https://` URL in production. This ensures cookies a
 | monerod RPC | `127.0.0.1:18081` | monero-wallet-rpc only |
 | monerod P2P | `0.0.0.0:18080` | Internet (required for sync) |
 
-Never expose Tiponero, `monero-wallet-rpc`, or `monerod` RPC ports to the internet.
+Never expose the Tiponero, `monero-wallet-rpc`, or `monerod` RPC ports to the internet.
 
 ### Firewall Rules
 
@@ -108,15 +108,15 @@ sudo ufw allow 443/tcp
 sudo ufw enable
 ```
 
-If using Cloudflare Tunnel, port 443 does not need to be opened: traffic flows through the outbound tunnel.
+If you use Cloudflare Tunnel, you do not open port 443, because the traffic goes through the outbound tunnel.
 
 ## View-Only Wallet
 
-Tiponero is designed to work with a **view-only wallet**. This is a critical security boundary:
+Tiponero uses a **view-only wallet**. This restriction is a critical security boundary:
 
 - The server can **see incoming payments** (via the view key)
 - The server **cannot spend funds** (no spend key)
-- Even if the server is compromised, your funds are safe
+- Even if an attacker compromises the server, your funds are safe
 
 Never use a full wallet (with spend key) on the Tiponero server.
 
@@ -144,7 +144,7 @@ cp /var/lib/tiponero/tiponero.db /backup/tiponero-$(date +%Y%m%d).db
 
 ### Environment Files
 
-If using environment files (`.env` or systemd `EnvironmentFile`), restrict permissions:
+If you use environment files (`.env` or the systemd `EnvironmentFile`), restrict the permissions:
 
 ```bash
 chmod 600 /etc/tiponero/env
@@ -153,7 +153,7 @@ chown tiponero:tiponero /etc/tiponero/env
 
 ### agenix (NixOS)
 
-For NixOS deployments, [agenix](https://github.com/ryantm/agenix) encrypts secrets at rest using the server's SSH host key:
+For NixOS deployments, [agenix](https://github.com/ryantm/agenix) encrypts secrets at rest with the SSH host key of the server:
 
 - Secrets are encrypted in the git repository
 - Decrypted at boot time to `/run/agenix/`
@@ -164,7 +164,7 @@ See the [NixOS deployment guide](/docs/deployment/nixos) for configuration examp
 
 ## Checklist
 
-Before going to production:
+Before you go to production:
 
 - [ ] Change the default `admin`/`admin` credentials
 - [ ] Set `ENCRYPTION_KEY` to a random 32+ character string
@@ -172,7 +172,7 @@ Before going to production:
 - [ ] Use a view-only wallet (not a full wallet)
 - [ ] Enable TOTP 2FA on the admin account
 - [ ] Bind Tiponero to `127.0.0.1` (not `0.0.0.0`)
-- [ ] Place behind a reverse proxy with TLS
-- [ ] Restrict database file permissions to the tiponero user
-- [ ] Set up regular database backups
+- [ ] Put Tiponero behind a reverse proxy with TLS
+- [ ] Restrict the database file permissions to the tiponero user
+- [ ] Make regular database backups
 - [ ] Close unnecessary firewall ports

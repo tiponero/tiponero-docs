@@ -5,7 +5,7 @@ title: SVG Badge
 
 # SVG Badge
 
-Every widget has a live SVG badge endpoint that can be embedded in markdown documents, README files, or any website. The badge displays the widget name, a QR code linking to the widget, and optionally the total received amount and transaction count.
+Every widget has a live SVG badge endpoint. You can embed the badge in markdown documents, README files, or any website. The badge shows the widget name and a QR code that links to the widget. It can also show the total received amount and the transaction count.
 
 ## Badge URL
 
@@ -13,17 +13,17 @@ Every widget has a live SVG badge endpoint that can be embedded in markdown docu
 https://your-instance.example.com/widget/<widget-id>/badge.svg
 ```
 
-No authentication is required.
+The badge is public and needs no authentication.
 
 ## Embedding in Markdown
 
-Link the badge image to the widget URL so visitors can click through to donate:
+Link the badge image to the widget URL. A visitor can then click the badge and donate:
 
 ```markdown
 [![Donate with Monero](https://your-instance.example.com/widget/f47ac10b-58cc-4372-a567-0e02b2c3d479/badge.svg)](https://your-instance.example.com/widget/f47ac10b-58cc-4372-a567-0e02b2c3d479)
 ```
 
-This renders as a clickable badge in GitHub READMEs, GitLab, and any markdown renderer that supports external images.
+The badge becomes clickable in GitHub READMEs, GitLab, and any markdown renderer that accepts external images.
 
 ## Embedding in HTML
 
@@ -40,18 +40,18 @@ This renders as a clickable badge in GitHub READMEs, GitLab, and any markdown re
 
 ## Badge Contents
 
-The badge is a 400x170px SVG that includes:
+The badge is an SVG image of 400x170px. It contains:
 
 | Element | Description |
 |---|---|
 | QR code | Links to the widget URL, rendered as inline SVG rectangles |
-| Widget name | The widget's display name (e.g. "Project Donations") |
+| Widget name | The widget display name (for example, "Project Donations") |
 | Stats | Total XMR received and transaction count (if `show_stats` is enabled) |
 | Footer | "Powered by Tiponero" text |
 
 ## Theme
 
-The badge respects the widget's theme setting:
+The badge uses the theme setting of the widget:
 
 | Theme | Badge style |
 |---|---|
@@ -61,6 +61,6 @@ The badge respects the widget's theme setting:
 
 ## Dynamic Content
 
-The badge is generated dynamically on each request. Stats (total received, transaction count) are always current. There is no caching: each request queries the database for the latest data.
+Tiponero generates the badge on each request. The stats (total received, transaction count) are always current. Tiponero does not cache the badge: each request queries the database for the latest data.
 
-If you need to display the badge in contexts where SVG rendering is limited (e.g., some email clients), consider taking a screenshot or converting to PNG.
+Some contexts do not fully render SVG, for example some email clients. In those contexts, take a screenshot of the badge or convert it to PNG.

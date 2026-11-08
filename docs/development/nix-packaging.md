@@ -45,7 +45,7 @@ tiponero = pkgs.buildGoModule {
 
 ## The vendor directory
 
-The repository commits `vendor/`, and `vendorHash = null` tells Nix to use it. Change both together:
+The repository commits `vendor/`. The `vendorHash = null` setting tells Nix to use that directory. Change the directory and the setting together:
 
 1. Change a Go dependency.
 2. Run `GOFLAGS=-mod=mod go mod vendor`.
@@ -55,7 +55,7 @@ A mismatch between `go.mod` and `vendor/modules.txt` stops the build in the `pre
 
 ## The templ version in nixpkgs
 
-`nativeBuildInputs` takes the templ binary from nixpkgs, so a nixpkgs update can move the command line tool ahead of the Go module in `go.mod`. The build then fails with `undefined: templ.ResolveAttributeValue`. See [templ Toolchain](/docs/development/templ-toolchain).
+`nativeBuildInputs` takes the templ binary from nixpkgs. Thus a nixpkgs update can move the command line tool ahead of the Go module in `go.mod`. The build then fails with `undefined: templ.ResolveAttributeValue`. See [templ Toolchain](/docs/development/templ-toolchain).
 
 Examine the templ version of a nixpkgs revision before an update:
 
@@ -101,4 +101,4 @@ The current derivation uses neither option. It regenerates with the nixpkgs bina
 
 ## Docker
 
-`Dockerfile` installs templ with `go install github.com/a-h/templ/cmd/templ@<version>`. That line is a third place that names the templ version, next to `go.mod` and `tools/go.mod`. Update it in the same commit.
+The `Dockerfile` installs templ with `go install github.com/a-h/templ/cmd/templ@<version>`. That line is a third place that names the templ version. The other two are `go.mod` and `tools/go.mod`. Update it in the same commit.

@@ -5,29 +5,29 @@ title: Authentication
 
 # API Authentication
 
-All `/api/v1/*` endpoints require authentication via a Bearer token in the `Authorization` header.
+All `/api/v1/*` endpoints require a Bearer token in the `Authorization` header for authentication.
 
 ## API Collection
 
-A ready-to-use API collection is available at [github.com/tiponero/tiponero-api-collection](https://github.com/tiponero/tiponero-api-collection). It includes:
+You can import the full API collection from [github.com/tiponero/tiponero-api-collection](https://github.com/tiponero/tiponero-api-collection). It includes:
 
-- **[Bruno](https://www.usebruno.com/)** collection: clone the repo and open it directly in Bruno
+- **[Bruno](https://www.usebruno.com/)** collection: clone the repository and open it directly in Bruno
 - **[Postman export](https://github.com/tiponero/tiponero-api-collection/blob/main/Tiponero%20API.json)**: import `Tiponero API.json` into Postman
 - **[OpenAPI spec](https://github.com/tiponero/tiponero-api-collection/blob/main/Tiponero%20API.yml)**: import `Tiponero API.yml` into any OpenAPI-compatible tool
 
 ## API Key Format
 
-API keys follow the format `tip_<32 hex characters>`:
+API keys use the format `tip_<32 hex characters>`:
 
 ```
 tip_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
 ```
 
-Keys are generated through the admin panel (**Settings > API Keys**) or via the admin UI. The raw key is shown **exactly once** at creation time: it cannot be retrieved afterward. Store it securely.
+You generate keys in the admin panel (**Settings > API Keys**). The admin panel shows the raw key **exactly once** at creation time. You cannot get the key again afterward. Store it securely.
 
 ## Usage
 
-Include the key in the `Authorization` header as a Bearer token:
+Send the key in the `Authorization` header as a Bearer token:
 
 ```bash
 curl -H "Authorization: Bearer tip_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4" \
@@ -39,10 +39,10 @@ curl -H "Authorization: Bearer tip_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4" \
 | Property | Value |
 |---|---|
 | Format | `tip_` + 32 hex characters |
-| Storage | bcrypt-hashed in database |
+| Storage | Hashed with bcrypt in the database |
 | Lookup | 8-character prefix index for fast candidate selection |
 | Expiry | Maximum 365 days from creation |
-| Last used | Updated asynchronously on each authenticated request |
+| Last used | The server updates it asynchronously on each authenticated request |
 
 ## Error Responses
 
@@ -78,7 +78,7 @@ curl -H "Authorization: Bearer invalid_key" \
 
 ## Response Format
 
-All API responses use a consistent JSON envelope:
+All API responses use the same JSON envelope:
 
 ### Success
 
@@ -112,4 +112,4 @@ For list endpoints:
 
 ## Rate Limiting
 
-There is no built-in rate limiting. If you expose the API publicly, configure rate limiting in your reverse proxy (nginx, Caddy, or Cloudflare).
+The API has no rate limit. If you make the API public, set a rate limit in your reverse proxy (nginx, Caddy, or Cloudflare).

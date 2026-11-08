@@ -5,7 +5,7 @@ title: Widgets
 
 # Widgets API
 
-Manage donation and payment widgets programmatically. Widgets define the appearance and behavior of the embeddable payment forms.
+You can manage donation and payment widgets with the API. Widgets set the appearance and behavior of the embedded payment forms.
 
 ## List Widgets
 
@@ -13,7 +13,7 @@ Manage donation and payment widgets programmatically. Widgets define the appeara
 GET /api/v1/widgets
 ```
 
-Returns all widgets belonging to the authenticated user.
+The response contains all widgets that belong to the authenticated user.
 
 **Example:**
 
@@ -52,7 +52,7 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 GET /api/v1/widgets/{id}
 ```
 
-Returns a single widget by ID.
+The response contains one widget, selected by ID.
 
 **Example:**
 
@@ -95,22 +95,22 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 POST /api/v1/widgets
 ```
 
-Creates a new widget. Returns the ID of the created widget.
+This request creates a widget. The response contains the ID of the new widget.
 
 **Request body:**
 
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `name` | string | Yes | *required* | Display name for the widget |
+| `name` | string | Yes | *required* | Name of the widget for display |
 | `mode` | string | No | `"donation"` | `"donation"` (open amount) or `"payment"` (fixed amount) |
 | `theme` | string | No | `"system"` | `"system"`, `"light"`, or `"dark"` |
-| `show_stats` | boolean | No | `true` | Show total received and transaction count on widget |
-| `preset_amounts` | number[] | No | `[]` | Preset XMR amounts shown as quick-select buttons |
+| `show_stats` | boolean | No | `true` | Show the total received and the transaction count on the widget |
+| `preset_amounts` | number[] | No | `[]` | XMR amounts that appear as quick-select buttons |
 | `button_text` | string | No | `"Donate"` | Text on the submit button |
-| `custom_message` | string | No | `"Your support is appreciated!"` | Message shown above the form |
-| `thank_you_message` | string | No | `"Thank you for your donation!"` | Message shown after confirmation |
+| `custom_message` | string | No | `"Your support is appreciated!"` | Message above the form |
+| `thank_you_message` | string | No | `"Thank you for your donation!"` | Message after confirmation |
 | `primary_color` | string | No | `"#ff6600"` | Hex color for the widget accent |
-| `redirect_url` | string | No | `""` | URL to redirect to after confirmation (payment mode) |
+| `redirect_url` | string | No | `""` | URL for the redirect after confirmation (payment mode) |
 
 **Example:**
 
@@ -141,7 +141,7 @@ curl -X POST \
 PATCH /api/v1/widgets/{id}
 ```
 
-Partially updates a widget. Only include the fields you want to change.
+This request updates some fields of a widget. Include only the fields that you want to change.
 
 **Example:**
 
@@ -185,7 +185,7 @@ curl -X PATCH \
 DELETE /api/v1/widgets/{id}
 ```
 
-Deletes a widget. Existing transactions linked to this widget will have their `widget_id` set to `NULL` (transactions are preserved).
+This request deletes a widget. The `widget_id` of each existing transaction that links to this widget becomes `NULL`. The transactions remain.
 
 **Example:**
 

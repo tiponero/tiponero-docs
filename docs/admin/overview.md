@@ -5,7 +5,7 @@ title: Dashboard Overview
 
 # Admin Panel
 
-The admin panel is a server-rendered web interface accessible at `/admin`. It provides a dashboard for monitoring transactions, managing widgets, and configuring your Tiponero instance.
+The admin panel is a web interface that the server renders at `/admin`. It gives you a dashboard to monitor transactions, manage widgets, and configure your Tiponero instance.
 
 ## Accessing the Admin Panel
 
@@ -13,7 +13,7 @@ Navigate to `https://your-instance.example.com/admin` in your browser. The root 
 
 ### Default Credentials
 
-On first startup, Tiponero creates a default admin user:
+On the first startup, Tiponero creates a default admin user:
 
 | Field | Value |
 |---|---|
@@ -21,37 +21,37 @@ On first startup, Tiponero creates a default admin user:
 | Password | `admin` |
 
 :::danger
-Change the default password immediately after your first login via **Settings > Password**.
+Change the default password immediately after your first login. Use **Settings > Password**.
 :::
 
 ### Two-Factor Authentication
 
-If TOTP 2FA is enabled, you will be prompted for a 6-digit code after entering your username and password. See [Settings](/docs/admin/settings) for setup instructions.
+If TOTP 2FA is enabled, the login page asks for a 6-digit code after you enter your username and password. See [Settings](/docs/admin/settings) for the setup steps.
 
 ## Dashboard
 
 The dashboard (`/admin/`) shows:
 
-- **Stats cards:** total transactions, total XMR received, pending count, today's count and amount
-- **Wallet status:** connection status of the `monero-wallet-rpc` instance (green = connected, red = disconnected)
+- **Stats cards:** total transactions, total XMR received, pending count, and the count and amount for today
+- **Wallet status:** the connection status of the `monero-wallet-rpc` instance (green = connected, red = disconnected)
 - **Recent transactions:** the last 10 transactions with status, amount, donor name, and timestamp
 
 ## Transactions
 
-The transactions page (`/admin/transactions`) provides:
+The transactions page (`/admin/transactions`) gives you:
 
 - **Paginated list:** 10 transactions per page
 - **Status filter:** filter by `pending`, `mempool`, `confirming`, `confirmed`, or `expired`
 - **Transaction detail:** click any transaction to see full details (subaddress, tx hash, confirmations, donor info)
-- **CSV export:** download all transactions as a CSV file via the **Export** button
+- **CSV export:** download all transactions as a CSV file with the **Export** button
 
 ## Widgets
 
-The widgets page (`/admin/widgets`) allows you to:
+On the widgets page (`/admin/widgets`) you can:
 
 - **View all widgets:** see name, mode, theme, and creation date
 - **Create a widget:** set name, mode, preset amounts, button text, colors, and redirect URL
-- **Delete a widget:** removes the widget (existing transactions are preserved with `widget_id` set to NULL)
+- **Delete a widget:** delete the widget (Tiponero keeps the existing transactions and sets `widget_id` to NULL)
 
 ## Navigation
 

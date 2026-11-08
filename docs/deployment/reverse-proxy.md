@@ -5,7 +5,7 @@ title: Reverse Proxy
 
 # Reverse Proxy & TLS
 
-Tiponero listens on a local HTTP port and should be placed behind a reverse proxy for TLS termination, compression, and access control. This guide covers nginx, Caddy, and Cloudflare Tunnel.
+Tiponero listens on a local HTTP port. Put Tiponero behind a reverse proxy for TLS termination, compression, and access control. This guide covers nginx, Caddy, and Cloudflare Tunnel.
 
 ## nginx
 
@@ -33,7 +33,7 @@ server {
 }
 ```
 
-Obtain a certificate with Certbot:
+Get a certificate with Certbot:
 
 ```bash
 sudo certbot --nginx -d pay.example.com
@@ -41,7 +41,7 @@ sudo certbot --nginx -d pay.example.com
 
 ## Caddy
 
-Caddy handles TLS automatically via Let's Encrypt:
+Caddy handles TLS automatically with Let's Encrypt:
 
 ```text title="Caddyfile"
 pay.example.com {
@@ -55,11 +55,11 @@ Start Caddy:
 caddy run --config Caddyfile
 ```
 
-That's it. Caddy provisions and renews TLS certificates automatically.
+Caddy gets and renews the TLS certificates automatically.
 
 ## Cloudflare Tunnel
 
-Cloudflare Tunnel provides a zero-inbound-port deployment. The tunnel daemon (`cloudflared`) establishes an outbound connection to Cloudflare's edge network. No ports need to be opened in your firewall.
+Cloudflare Tunnel gives a deployment with no inbound ports. The tunnel daemon (`cloudflared`) makes an outbound connection to the Cloudflare edge network. You do not open ports in your firewall.
 
 ### Manual Setup
 
@@ -120,19 +120,19 @@ For NixOS deployments, use the built-in `cloudflared` module:
 
 This approach means:
 - **No inbound firewall ports** needed for web traffic
-- TLS is handled by Cloudflare's edge
-- Your server's IP address is not exposed
-- DDoS protection is included
+- The Cloudflare edge handles TLS
+- Cloudflare does not expose the IP address of your server
+- The service includes DDoS protection
 
 ### Important: BASE_URL
 
-When using a reverse proxy or tunnel, set `BASE_URL` to your public HTTPS URL:
+When you use a reverse proxy or tunnel, set `BASE_URL` to your public HTTPS URL:
 
 ```bash
 BASE_URL=https://pay.example.com
 ```
 
-This ensures:
-- Session cookies are marked `Secure` (HTTPS-only)
+As a result:
+- Session cookies get the `Secure` flag (HTTPS-only)
 - Widget URLs and QR codes use the correct public URL
 - Redirects work correctly

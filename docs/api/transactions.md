@@ -5,7 +5,7 @@ title: Transactions
 
 # Transactions API
 
-Query payment and donation transaction records. Transactions are created automatically when users interact with widgets. The API provides read-only access to transaction data.
+You can query payment and donation transaction records. Tiponero creates a transaction automatically when a user interacts with a widget. The API gives read-only access to transaction data.
 
 ## List Transactions
 
@@ -13,14 +13,14 @@ Query payment and donation transaction records. Transactions are created automat
 GET /api/v1/transactions
 ```
 
-Returns a paginated list of transactions with optional status filtering.
+The response contains a paginated list of transactions. You can add an optional status filter.
 
 **Query parameters:**
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `page` | integer | `1` | Page number (1-indexed) |
-| `limit` | integer | `20` | Results per page (max 100) |
+| `limit` | integer | `20` | Number of results per page (max 100) |
 | `status` | string | *all* | Filter by status: `pending`, `mempool`, `confirming`, `confirmed`, `expired` |
 
 **Example:**
@@ -85,7 +85,7 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 GET /api/v1/transactions/{id}
 ```
 
-Returns a single transaction by ID.
+The response contains one transaction, selected by ID.
 
 **Example:**
 
@@ -132,19 +132,19 @@ curl -H "Authorization: Bearer tip_<your_api_key>" \
 | Field | Type | Description |
 |---|---|---|
 | `id` | string | UUID of the transaction |
-| `widget_id` | string\|null | UUID of the widget that created this transaction (null if widget deleted) |
-| `subaddress` | string | Unique Monero subaddress assigned to this transaction |
+| `widget_id` | string\|null | UUID of the widget that made this transaction (`null` if the widget is deleted) |
+| `subaddress` | string | Unique Monero subaddress that belongs to this transaction |
 | `subaddress_index` | integer | Index of the subaddress in the wallet |
 | `amount` | integer | Amount in piconero (1 XMR = 1,000,000,000,000) |
-| `amount_xmr` | string | Amount formatted as XMR string |
-| `fiat_amount` | number\|null | Fiat equivalent at transaction creation time |
-| `fiat_currency` | string\|null | ISO 4217 currency code (e.g. `"USD"`) |
+| `amount_xmr` | string | Amount as an XMR string |
+| `fiat_amount` | number\|null | Fiat equivalent when Tiponero creates the transaction |
+| `fiat_currency` | string\|null | ISO 4217 currency code (for example, `"USD"`) |
 | `status` | string | `pending`, `mempool`, `confirming`, `confirmed`, or `expired` |
 | `confirmations` | integer | Current number of block confirmations |
 | `is_payment` | boolean | `false` for donations, `true` for fixed-amount payments |
-| `donor_name` | string\|null | Optional name provided by the donor |
+| `donor_name` | string\|null | Optional name from the donor |
 | `note` | string\|null | Optional message from the donor |
-| `tx_hash` | string\|null | Monero transaction hash (set when confirmed) |
+| `tx_hash` | string\|null | Monero transaction hash (available after confirmation) |
 | `created_at` | integer | Unix timestamp of creation |
 | `updated_at` | integer | Unix timestamp of last status update |
 | `confirmed_at` | integer\|null | Unix timestamp of confirmation |
